@@ -46,4 +46,11 @@ This was the most important check for our system. We looked for attributes that 
 - **Justification:** While the logic is derived, we decided to store `severity` as a static value for fast reporting on the dashboard without needing to recalculate the ML logic in the database every time.
 - **Asset Table:** We kept `asset_type` (Crypto vs Stock) in the `assets` table. We checked if we needed a separate `asset_types` table, but since we only have two categories, we decided to keep it simple as a VARCHAR to avoid unnecessary joins.
 
-**Conclusion:** No transitive dependencies were found that would interfere with data integrity. The schema is normalized up to 3NF.
+---
+
+### Recent Schema Updates
+
+During the normalization review for Milestone 2, we identified a few areas where candidate keys were not properly constrained:
+
+- **Unique Constraints:** We added `UNIQUE` constraints to `assets.symbol` and `users.username`. This prevents 1NF violations where duplicate logical records could exist under different Primary Keys.
+- **Constraint Enforcement:** By adding these to [schema.sql](schema.sql), we ensure the database physically enforces the rules we defined in our logical design.
