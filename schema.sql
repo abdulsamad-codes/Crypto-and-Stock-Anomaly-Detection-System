@@ -30,21 +30,24 @@ CREATE TABLE model_logs (
 
 CREATE TABLE price_history (
     price_id INT PRIMARY KEY AUTO_INCREMENT,
-    asset_id INT,
-    timestamp DATETIME,
-    price_close DECIMAL(10, 2),
+    asset_id INT NOT NULL,
+    timestamp DATETIME NOT NULL,
+    price_close DECIMAL(10, 2) NOT NULL,
     volume DECIMAL(15, 2),
-    FOREIGN KEY (asset_id) REFERENCES assets (asset_id)
+    FOREIGN KEY (asset_id) REFERENCES assets(asset_id),
+    INDEX (timestamp),
+    INDEX (asset_id)
 );
 
 CREATE TABLE anomalies (
     anomaly_id INT PRIMARY KEY AUTO_INCREMENT,
-    asset_id INT,
-    price_id INT,
-    score FLOAT,
+    asset_id INT NOT NULL,
+    price_id INT NOT NULL,
+    score FLOAT NOT NULL,
     severity VARCHAR(10),
-    FOREIGN KEY (asset_id) REFERENCES assets (asset_id),
-    FOREIGN KEY (price_id) REFERENCES price_history (price_id)
+    FOREIGN KEY (asset_id) REFERENCES assets(asset_id),
+    FOREIGN KEY (price_id) REFERENCES price_history(price_id),
+    INDEX (severity)
 );
 
 CREATE TABLE alerts (
