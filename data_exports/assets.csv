@@ -1,0 +1,5 @@
+asset_id,symbol,name,asset_type
+1,BTC,Bitcoin,Crypto
+2,ETH,Ethereum,Crypto
+3,NVDA,NVIDIA,Stock
+4,TSLA,Tesla,Stock
