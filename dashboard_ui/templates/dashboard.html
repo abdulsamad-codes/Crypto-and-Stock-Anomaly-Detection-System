@@ -78,11 +78,16 @@
                         <i class="fas fa-fire-flame-curved text-orange-500"></i>
                         Market Volatility Pulse
                     </h2>
-                    <select id="assetSelect" class="bg-[#0D1117] border border-[#30363D] rounded-lg px-4 py-2 text-sm text-white" onchange="updateMainChart()">
-                        {% for asset in assets %}
-                        <option value="{{ asset.asset_id }}">{{ asset.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="flex gap-4">
+                        <button onclick="goToDeepDive()" class="bg-[#21262D] hover:bg-[#30363D] text-[#58A6FF] px-4 py-2 rounded-lg text-sm font-bold border border-[#30363D] transition-all">
+                            <i class="fas fa-magnifying-glass-chart me-2"></i>Deep Dive Analysis
+                        </button>
+                        <select id="assetSelect" class="bg-[#0D1117] border border-[#30363D] rounded-lg px-4 py-2 text-sm text-white" onchange="updateMainChart()">
+                            {% for asset in assets %}
+                            <option value="{{ asset.asset_id }}">{{ asset.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <div class="relative h-[400px]">
                     <canvas id="nerveChart"></canvas>
@@ -109,7 +114,7 @@
                     <p class="text-center text-[#8B949E] py-10">All market signals within normal Z-score range.</p>
                     {% endfor %}
                 </div>
-                <button class="w-full mt-6 py-4 bg-[#238636] hover:bg-[#2ea043] transition-colors rounded-lg font-bold text-center">
+                <button onclick="window.location.href='/config'" class="w-full mt-6 py-4 bg-[#238636] hover:bg-[#2ea043] transition-colors rounded-lg font-bold text-center">
                     MANAGE THRESHOLDS
                 </button>
             </div>
@@ -117,6 +122,11 @@
     </main>
 
     <script>
+        function goToDeepDive() {
+            const assetId = document.getElementById('assetSelect').value;
+            window.location.href = `/analysis/${assetId}`;
+        }
+
         let myChart;
         async function updateMainChart() {
             const assetId = document.getElementById('assetSelect').value;
