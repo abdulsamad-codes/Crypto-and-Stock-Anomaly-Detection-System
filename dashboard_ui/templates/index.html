@@ -4,58 +4,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto & Stock Anomaly Dashboard</title>
+    <!-- Modern UI Frameworks -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #121212; color: #e0e0e0; }
-        .card { background-color: #1e1e1e; border: 1px solid #333; color: white; }
-        .navbar { background-color: #0d6efd !important; }
-        .alert-item { border-left: 4px solid #ffc107; background: #2c2c2c; margin-bottom: 10px; padding: 10px; }
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+        }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Inter', sans-serif; }
+        .card { background-color: var(--card-bg); border: 1px solid #334155; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .nav-custom { background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%); border-bottom: 1px solid #334155; }
+        .stat-card { transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .alert-item { border-left: 4px solid #f59e0b; background: #334155; border-radius: 8px; margin-bottom: 12px; padding: 12px; font-size: 0.9rem; }
+        .btn-primary { background-color: var(--accent); border: none; }
+        .icon-box { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(56, 189, 248, 0.1); color: var(--accent); }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-primary mb-4">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">Market Anomaly System</span>
+    <!-- Navbar -->
+    <nav class="navbar nav-custom navbar-dark py-3 mb-4">
+        <div class="container-fluid px-4">
+            <span class="navbar-brand fw-bold">
+                <i class="fas fa-shield-halved me-2"></i>Crypto & Stock Anomaly Detection System
+            </span>
+            <div class="d-flex">
+                <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
+                    <i class="fas fa-circle-dot fa-beat-fade me-2"></i>Connected to MySQL
+                </span>
+            </div>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container-fluid px-4">
+        <!-- Dashboard Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card stat-card p-3">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-dim mb-1">Total Assets</p>
+                            <h3 class="mb-0">{{ stats.assets }}</h3>
+                        </div>
+                        <div class="icon-box"><i class="fas fa-coins fa-lg"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card p-3">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-dim mb-1">Price Records</p>
+                            <h3 class="mb-0">{{ stats.rows }}</h3>
+                        </div>
+                        <div class="icon-box"><i class="fas fa-database fa-lg"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card p-3">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-dim mb-1">Anomalies Detected</p>
+                            <h3 class="mb-0 text-warning">{{ stats.anomalies }}</h3>
+                        </div>
+                        <div class="icon-box" style="color:#f59e0b;background:rgba(245,158,11,0.1)"><i class="fas fa-triangle-exclamation fa-lg"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
-            <!-- Sidebar / Assets -->
-            <div class="col-md-3">
+            <!-- Sidebar Controls -->
+            <div class="col-lg-3">
                 <div class="card p-3 mb-4">
-                    <h5>Tracked Assets</h5>
-                    <select id="assetSelect" class="form-select bg-dark text-white border-secondary mb-3" onchange="updateChart()">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-sliders me-2"></i>System Controls</h6>
+                    <label class="small text-dim mb-2">Select Market Asset</label>
+                    <select id="assetSelect" class="form-select bg-dark text-white border-secondary mb-3" onchange="updateDashboard()">
                         {% for asset in assets %}
                         <option value="{{ asset.asset_id }}">{{ asset.name }} ({{ asset.symbol }})</option>
                         {% endfor %}
                     </select>
-                    <div id="assetInfo">
-                        <small class="text-muted">Select an asset to view real-time price history and anomaly trends.</small>
+                    
+                    <div id="quickInsights" class="mt-3 p-3 bg-dark rounded border border-secondary shadow-sm">
+                        <label class="small text-dim d-block mb-2">Asset Performance Insights</label>
+                        <div class="row text-center">
+                            <div class="col-6 mb-2">
+                                <small class="text-dim d-block">High</small>
+                                <span id="statHigh" class="text-success fw-bold">-</span>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <small class="text-dim d-block">Low</small>
+                                <span id="statLow" class="text-danger fw-bold">-</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="card p-3">
-                    <h5>Recent Alerts</h5>
+                    <h6 class="fw-bold mb-3 text-warning"><i class="fas fa-bell me-2"></i>Real-time Alerts</h6>
                     <div id="alertsList">
                         {% for alert in alerts %}
                         <div class="alert-item">
-                            <small class="text-warning">Alert #{{ alert.alert_id }}</small><br>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="badge bg-warning text-dark">Warning</span>
+                                <small class="text-dim">#{{ alert.alert_id }}</small>
+                            </div>
                             {{ alert.alert_message }}
                         </div>
                         {% else %}
-                        <p class="text-muted">No active anomalies detected.</p>
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                            <p class="text-muted small">Systems are normal.<br>No anomalies found.</p>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
 
-            <!-- Main Chart Area -->
-            <div class="col-md-9">
-                <div class="card p-4">
-                    <h5 id="chartTitle">Price History</h5>
-                    <canvas id="priceChart"></canvas>
+            <!-- Visualization Area -->
+            <div class="col-lg-9">
+                <div class="card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 fw-bold" id="chartTitle">Market Price Trends (OHLCV)</h5>
+                    </div>
+                    <div class="chart-container" style="position: relative; height:400px;">
+                        <canvas id="priceChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -64,45 +144,61 @@
     <script>
         let myChart;
 
-        async function updateChart() {
+        async function updateDashboard() {
             const assetId = document.getElementById('assetSelect').value;
-            const response = await fetch(`/api/prices/${assetId}`);
-            const data = await response.json();
-
-            const ctx = document.getElementById('priceChart').getContext('2d');
             
-            if (myChart) {
-                myChart.destroy();
-            }
+            // 1. Fetch Price Data for Chart
+            const resPrice = await fetch(`/api/prices/${assetId}`);
+            const priceData = await resPrice.json();
+
+            // 2. Fetch Insights for Sidebar
+            const resStats = await fetch(`/api/stats/${assetId}`);
+            const stats = await resStats.json();
+
+            // Update UI Stats
+            document.getElementById('statHigh').innerText = stats.max_p ? `$${parseFloat(stats.max_p).toLocaleString()}` : 'N/A';
+            document.getElementById('statLow').innerText = stats.min_p ? `$${parseFloat(stats.min_p).toLocaleString()}` : 'N/A';
+
+            // Update Chart
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            if (myChart) myChart.destroy();
 
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: data.labels,
+                    labels: priceData.labels,
                     datasets: [{
-                        label: 'Price (USD)',
-                        data: data.values,
-                        borderColor: '#0d6efd',
-                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        label: 'Closing Price (USD)',
+                        data: priceData.values,
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                        borderWidth: 2,
                         fill: true,
+                        pointRadius: 2,
                         tension: 0.1
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
-                        x: { grid: { color: '#333' }, ticks: { color: '#aaa' } },
-                        y: { grid: { color: '#333' }, ticks: { color: '#aaa' } }
+                        x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        y: { 
+                            grid: { color: '#334155' }, 
+                            ticks: { 
+                                color: '#94a3b8',
+                                callback: function(value) { return '$' + value; }
+                            } 
+                        }
                     },
                     plugins: {
-                        legend: { labels: { color: 'white' } }
+                        legend: { display: false }
                     }
                 }
             });
         }
 
-        // Initial Load
-        window.onload = updateChart;
+        window.onload = updateDashboard;
     </script>
 </body>
 </html>
