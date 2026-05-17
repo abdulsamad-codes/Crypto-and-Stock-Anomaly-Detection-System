@@ -17,43 +17,69 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    # Fetch assets for the sidebar/dropdown
+    # Page 1: Global Nerve Center
     conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # Get system stats for the top cards
+        # Stats for Nerve Center
         cursor.execute("SELECT COUNT(*) as count FROM assets")
         asset_count = cursor.fetchone()['count']
-        
         cursor.execute("SELECT COUNT(*) as count FROM price_history")
         row_count = cursor.fetchone()['count']
-        
         cursor.execute("SELECT COUNT(*) as count FROM anomalies")
         anomaly_count = cursor.fetchone()['count']
 
         cursor.execute("SELECT * FROM assets")
         assets = cursor.fetchall()
         
-        # Fetch recent alerts securely
-        cursor.execute("SELECT * FROM alerts ORDER BY alert_id DESC LIMIT 5")
+        cursor.execute("SELECT * FROM alerts ORDER BY alert_id DESC LIMIT 10")
         alerts = cursor.fetchall()
         
         cursor.close()
-        return render_template('index.html', 
+        return render_template('dashboard.html', 
                              assets=assets, 
                              alerts=alerts, 
-                             stats={
-                                 'assets': asset_count,
-                                 'rows': row_count,
-                                 'anomalies': anomaly_count
-                             })
+                             stats={'assets': asset_count, 'rows': row_count, 'anomalies': anomaly_count})
     except mysql.connector.Error as err:
-        return f"Database Error: {err}. Please ensure your password is correct in app.py.", 500
+        return f"Database Error: {err}", 500
     finally:
         if conn and conn.is_connected():
             conn.close()
+
+@app.route('/stream')
+def stream():
+    # Page 2: Live Anomaly Stream
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT a.*, an.severity, an.type as anomaly_type, asset.symbol 
+        FROM alerts a
+        JOIN anomalies an ON a.anomaly_id = an.anomaly_id
+        JOIN assets asset ON an.asset_id = asset.asset_id
+        ORDER BY a.alert_id DESC
+    """)
+    alerts = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('stream.html', alerts=alerts)
+
+@app.route('/analysis/<int:asset_id>')
+def analysis(asset_id):
+    # Page 3: Deep Dive
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM assets WHERE asset_id = %s", (asset_id,))
+    asset = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return render_template('analysis.html', asset=asset)
+
+@app.route('/config')
+def config():
+    # Page 4: Configuration
+    return render_template('config.html')
 
 @app.route('/api/stats/<int:asset_id>')
 def get_asset_stats(asset_id):
