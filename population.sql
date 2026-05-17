@@ -6,9 +6,15 @@
 USE crypto_anomaly_db;
 
 -- 2. Bulk Load Data (Milestone 5 Requirement)
--- Note: Replace 'E:/path/to/' with your actual absolute path if running in MySQL Workbench
--- We are loading the real-time data generated in Milestone 3
+/* 
+NOTE: If your MySQL server has --secure-file-priv or --local-infile disabled (Error 1290 or 3948), 
+use the 'Table Data Import Wizard' in MySQL Workbench:
+1. Right-click 'assets' table -> Table Data Import Wizard -> Select assets.csv
+2. Right-click 'price_history' table -> Table Data Import Wizard -> Select price_history.csv
+*/
 
+-- The commands below are kept as a reference for environments where LOAD DATA is enabled:
+/*
 -- Load Assets
 LOAD DATA INFILE 'E:/Study Material/4th Semester All Data/Sir Ali Hassan (Database Systems (Lab))/Crypto-and-Stock-Anomaly-Detection-System/data_exports/assets.csv' INTO
 TABLE assets FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 ROWS;
@@ -16,11 +22,12 @@ TABLE assets FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n'
 -- Load Price History
 LOAD DATA INFILE 'E:/Study Material/4th Semester All Data/Sir Ali Hassan (Database Systems (Lab))/Crypto-and-Stock-Anomaly-Detection-System/data_exports/price_history.csv' INTO
 TABLE price_history FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 ROWS (
-    timestamp,
-    price_close,
-    volume,
-    asset_id
+timestamp,
+price_close,
+volume,
+asset_id
 );
+*/
 
 -- 3. Required DML Operations
 -- UPDATE operation with a WHERE condition
