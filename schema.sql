@@ -1,5 +1,7 @@
 -- 1. Create Database
-CREATE DATABASE IF NOT EXISTS crypto_anomaly_db;
+DROP DATABASE IF EXISTS crypto_anomaly_db;
+
+CREATE DATABASE crypto_anomaly_db;
 
 USE crypto_anomaly_db;
 
@@ -34,7 +36,7 @@ CREATE TABLE price_history (
     timestamp DATETIME NOT NULL,
     price_close DECIMAL(10, 2) NOT NULL,
     volume DECIMAL(15, 2),
-    FOREIGN KEY (asset_id) REFERENCES assets(asset_id),
+    FOREIGN KEY (asset_id) REFERENCES assets (asset_id),
     INDEX (timestamp),
     INDEX (asset_id)
 );
@@ -45,8 +47,8 @@ CREATE TABLE anomalies (
     price_id INT NOT NULL,
     score FLOAT NOT NULL,
     severity VARCHAR(10),
-    FOREIGN KEY (asset_id) REFERENCES assets(asset_id),
-    FOREIGN KEY (price_id) REFERENCES price_history(price_id),
+    FOREIGN KEY (asset_id) REFERENCES assets (asset_id),
+    FOREIGN KEY (price_id) REFERENCES price_history (price_id),
     INDEX (severity)
 );
 
