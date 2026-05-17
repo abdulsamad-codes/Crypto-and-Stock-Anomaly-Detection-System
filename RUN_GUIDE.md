@@ -6,7 +6,10 @@ This guide explains how to set up and run the **Crypto & Stock Anomaly Detection
 
 1. Open **MySQL Workbench**.
 2. Run the `schema.sql` script to create the database and tables.
-3. Run the `population.sql` script to load the real-market data from the `data_exports` folder.
+3. Import Data using the **Table Data Import Wizard**:
+   - Right-click `assets` table -> Table Data Import Wizard -> Select `data_exports/assets.csv`.
+   - Right-click `price_history` table -> Table Data Import Wizard -> Select `data_exports/price_history.csv`.
+4. (Optional) Run `population.sql` to execute validation queries.
 
 ## 2. Python Environment Setup
 
@@ -36,12 +39,17 @@ db_config = {
 3. Start the Flask server: `python app.py`
 4. Open your browser and go to: `http://127.0.0.1:5000`
 
-## 5. (Optional) Fetch New Data
+## 5. UI Navigation Features
+
+- **Global Nerve Center:** View real-time market pulse and system stats.
+- **Deep Dive Analysis:** Select an asset and click the "Deep Dive" button for technical charting and order book visuals.
+- **Live Stream:** Explains the "Agentic Reasoning" behind every detected anomaly.
+- **Config:** Control system sensitivity and Z-Score thresholds.
+
+## 6. (Optional) Fetch New Data
 
 To update the CSV files with the latest market prices, run the generator script from the root:
 
 ```powershell
 python data_generator.py
 ```
-
-After running this, re-run the `population.sql` in MySQL to see the new data on the dashboard.
