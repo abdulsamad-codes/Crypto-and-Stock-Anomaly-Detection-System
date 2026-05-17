@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ asset.symbol }} Deep-Dive | Anomaly.AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0D1117; color: #F0F6FC; font-size: 14pt; }
+        .high-contrast-card { background-color: #161B22; border: 1px solid #30363D; border-radius: 12px; }
+        .order-book-red { color: #FF3131; background: rgba(255, 49, 49, 0.1); }
+        .order-book-green { color: #00FF41; background: rgba(0, 255, 65, 0.1); }
+        h1, h2 { font-size: 1.5rem; font-weight: 700; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <nav class="bg-[#161B22] border-b border-[#30363D] px-8 py-4 mb-8">
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center gap-4">
+                <i class="fas fa-brain text-4xl text-[#58A6FF]"></i>
+                <span class="text-2xl font-bold">ANOMALY.AI</span>
+            </div>
+            <div class="flex gap-8 text-lg font-semibold">
+                <a href="/" class="hover:text-[#58A6FF]">Nerve Center</a>
+                <a href="/stream" class="hover:text-[#58A6FF]">Live Stream</a>
+                <a href="/config" class="hover:text-[#58A6FF]">Config</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-8">
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <h1 class="text-5xl font-black tracking-tighter uppercase mb-2">{{ asset.name }} ({{ asset.symbol }})</h1>
+                <p class="text-[#8B949E] text-xl">Technical Analysis & Liquidity Cluster Visualization</p>
+            </div>
+            <div class="text-right">
+                <span class="text-xs font-black uppercase text-[#8B949E] block mb-1">Current Sector</span>
+                <span class="text-2xl font-bold text-[#58A6FF]">{{ asset.type }}</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Advanced Candlestick Chart (Chart.js Line) -->
+            <div class="lg:col-span-3 high-contrast-card p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold flex items-center gap-3">
+                        <i class="fas fa-chart-line text-[#58A6FF]"></i> Price Action (OHLCV)
+                    </h2>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-red-950 text-red-400 border border-red-900 rounded text-xs px-2 py-1 uppercase font-black">Anomaly Detected</span>
+                    </div>
+                </div>
+                <div class="relative h-[500px]">
+                    <canvas id="diveChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Order Book Imbalance -->
+            <div class="space-y-8">
+                <div class="high-contrast-card p-6">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-3">
+                        <i class="fas fa-arrows-up-down text-[#BC13FE]"></i> Liquidity
+                    </h2>
+                    <div class="space-y-2 font-mono text-sm uppercase">
+                        <div class="flex justify-between p-2 order-book-red border-r-4 border-red-500">
+                            <span>Sell 34.2 BTC</span>
+                            <span>$65,402</span>
+                        </div>
+                        <div class="flex justify-between p-2 order-book-red border-r-4 border-red-500 opacity-75">
+                            <span>Sell 12.5 BTC</span>
+                            <span>$65,390</span>
+                        </div>
+                        <div class="my-4 py-2 text-center border-y border-[#30363D] font-bold text-xl">
+                            $65,385.20
+                        </div>
+                        <div class="flex justify-between p-2 order-book-green border-r-4 border-green-500">
+                            <span>Buy 45.1 BTC</span>
+                            <span>$65,380</span>
+                        </div>
+                        <div class="flex justify-between p-2 order-book-green border-r-4 border-green-500 opacity-75">
+                            <span>Buy 8.9 BTC</span>
+                            <span>$65,375</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="high-contrast-card p-6 bg-gradient-to-br from-[#161B22] to-[#0D1117]">
+                    <h2 class="text-xl font-bold mb-4">Whale Movement</h2>
+                    <div class="text-[14pt] leading-relaxed">
+                        <p class="text-[#8B949E]">Detected <span class="text-emerald-400 font-bold">$2M USDC</span> inflow into exchange address <span class="text-[#58A6FF]">0x4f...a3</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function loadDive() {
+            const res = await fetch(`/api/prices/{{ asset.asset_id }}`);
+            const data = await res.json();
+            const ctx = document.getElementById('diveChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Weighted Price',
+                        data: data.values,
+                        borderColor: '#58A6FF',
+                        borderWidth: 4,
+                        pointBackgroundColor: '#0D1117',
+                        pointBorderColor: '#58A6FF',
+                        pointRadius: 4,
+                        pointHoverRadius: 8,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: true, grid: { display: false }, ticks: { color: '#8B949E' } },
+                        y: { display: true, grid: { color: '#30363D' }, ticks: { color: '#8B949E' } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+        window.onload = loadDive;
+    </script>
+</body>
+</html>
