@@ -39,13 +39,16 @@
 
         <div class="space-y-8">
             {% for alert in alerts %}
-            <div class="high-contrast-card overflow-hidden">
+            <div id="alert-{{ alert.alert_id }}" class="high-contrast-card overflow-hidden hover:border-[#58A6FF] transition-colors group shadow-2xl">
                 <div class="grid grid-cols-1 md:grid-cols-4">
                     <!-- Left: Metadata -->
-                    <div class="p-6 border-r border-[#30363D] bg-[#21262D]">
+                    <div class="p-6 border-r border-[#30363D] bg-[#21262D] group-hover:bg-[#161B22] transition-colors cursor-pointer" onclick="window.location.href='/analysis/{{ alert.asset_id }}'">
                         <div class="mb-6">
                             <span class="text-xs font-black uppercase text-[#8B949E] block mb-1">Asset</span>
-                            <h4 class="text-2xl text-[#58A6FF]">{{ alert.symbol }}</h4>
+                            <h4 class="text-2xl text-[#58A6FF] flex items-center gap-2">
+                                {{ alert.symbol }}
+                                <i class="fas fa-external-link-alt text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </h4>
                         </div>
                         <div class="mb-6">
                             <span class="text-xs font-black uppercase text-[#8B949E] block mb-1">Severity</span>

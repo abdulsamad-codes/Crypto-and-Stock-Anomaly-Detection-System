@@ -54,7 +54,7 @@ def stream():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT a.*, an.severity, an.type as anomaly_type, asset.symbol 
+        SELECT a.*, an.severity, an.type as anomaly_type, asset.symbol, asset.asset_id 
         FROM alerts a
         JOIN anomalies an ON a.anomaly_id = an.anomaly_id
         JOIN assets asset ON an.asset_id = asset.asset_id

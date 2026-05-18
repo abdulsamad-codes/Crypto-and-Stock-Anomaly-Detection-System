@@ -102,13 +102,17 @@
                 </h2>
                 <div class="space-y-4">
                     {% for alert in alerts %}
-                    <div class="p-4 bg-[#21262D] border-l-4 border-emerald-500 rounded-lg">
+                    <div class="p-4 bg-[#21262D] border-l-4 border-emerald-500 rounded-lg hover:bg-[#30363D] transition-all cursor-pointer shadow-md group" 
+                         onclick="window.location.href='/stream#alert-{{ alert.alert_id }}'">
                         <div class="flex justify-between items-start mb-2">
-                             <span class="text-xs font-black uppercase tracking-tighter text-emerald-400">PUMP ALERT</span>
+                             <span class="text-xs font-black uppercase tracking-tighter text-emerald-400 group-hover:text-emerald-300">PUMP ALERT</span>
                              <span class="text-[10pt] text-[#8B949E]">#{{ alert.alert_id }}</span>
                         </div>
                         <p class="text-sm leading-relaxed mb-3">{{ alert.alert_message }}</p>
-                        <a href="/stream" class="text-xs font-bold text-[#58A6FF] hover:underline uppercase">View Reasoning Trace →</a>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-[#58A6FF] group-hover:underline uppercase">View Reasoning Trace →</span>
+                            <i class="fas fa-chevron-right text-[#30363D] group-hover:text-[#58A6FF] transition-colors"></i>
+                        </div>
                     </div>
                     {% else %}
                     <p class="text-center text-[#8B949E] py-10">All market signals within normal Z-score range.</p>
