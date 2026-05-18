@@ -1,0 +1,15 @@
+# Python Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Vercel
+.vercel/
+
+# Other
+.DS_Store
+*.sql.shadow
