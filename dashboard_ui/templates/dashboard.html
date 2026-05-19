@@ -7,129 +7,283 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        cyber: {
+                            base: '#050505',
+                            card: 'rgba(17, 17, 17, 0.6)',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            accent: '#00F0FF',
+                            accentGlow: 'rgba(0, 240, 255, 0.4)',
+                            purple: '#7B2CBF',
+                            emerald: '#00FF66'
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0D1117; color: #F0F6FC; font-size: 14pt; }
-        .high-contrast-card { background-color: #161B22; border: 1px solid #30363D; border-radius: 12px; }
-        .neon-red { color: #FF3131; }
-        .neon-green { color: #00FF41; }
-        .neon-purple { color: #BC13FE; }
-        .nav-link-active { border-bottom: 2px solid #58A6FF; color: #58A6FF; }
-        h1, h2, h3 { font-size: 1.5rem; font-weight: 700; color: #F0F6FC; }
+        body { 
+            background-color: #050505; 
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        
+        .glass-card {
+            background: var(--tw-colors-cyber-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--tw-colors-cyber-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #FFF 0%, #A0AEC0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-gradient-accent {
+            background: linear-gradient(135deg, #00F0FF 0%, #0080FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-link-active {
+            position: relative;
+            color: #FFF;
+        }
+        .nav-link-active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00F0FF;
+            box-shadow: 0 0 10px #00F0FF;
+            border-radius: 2px;
+        }
+        
+        /* Background Glow Blobs */
+        .glow-blob {
+            position: absolute;
+            filter: blur(120px);
+            opacity: 0.4;
+            z-index: -1;
+            border-radius: 50%;
+        }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- Navbar -->
-    <nav class="bg-[#161B22] border-b border-[#30363D] px-8 py-4 sticky top-0 z-50">
+<body class="min-h-screen relative font-sans antialiased selection:bg-cyber-accent selection:text-black">
+    <!-- Ambient Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+        <div class="glow-blob bg-cyber-accent w-[500px] h-[500px] top-[-10%] left-[-10%] animate-blob"></div>
+        <div class="glow-blob bg-cyber-purple w-[600px] h-[600px] bottom-[-20%] right-[-10%] animate-blob" style="animation-delay: 2s;"></div>
+        <div class="glow-blob bg-cyber-emerald w-[400px] h-[400px] top-[40%] left-[40%] animate-blob opacity-20" style="animation-delay: 4s;"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+    </div>
+
+    <!-- Premium Navbar -->
+    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/40 px-8 py-5">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4">
-                <i class="fas fa-brain text-4xl text-[#58A6FF]"></i>
-                <span class="text-2xl font-bold tracking-tight">ANOMALY.AI</span>
+            <div class="flex items-center gap-4 group cursor-pointer">
+                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 group-hover:border-cyber-accent/60 transition-all duration-500 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <i class="fas fa-brain text-2xl text-cyber-accent"></i>
+                </div>
+                <span class="text-2xl font-extrabold tracking-tight text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
             </div>
-            <div class="flex gap-8 text-lg font-semibold">
-                <a href="/" class="nav-link-active pb-1">Nerve Center</a>
-                <a href="/stream" class="hover:text-[#58A6FF] transition-colors">Live Stream</a>
-                <a href="/config" class="hover:text-[#58A6FF] transition-colors">Config</a>
+            <div class="flex gap-10 text-sm font-semibold tracking-wide uppercase text-slate-400">
+                <a href="/" class="nav-link-active transition-colors hover:text-white">Nerve Center</a>
+                <a href="/stream" class="transition-colors hover:text-white relative group">
+                    Live Stream
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="/config" class="transition-colors hover:text-white relative group">
+                    Config
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                </a>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="flex h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-sm font-medium text-emerald-400 uppercase tracking-widest">System Live</span>
+            <div class="flex items-center gap-3 px-4 py-2 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/20 shadow-[0_0_10px_rgba(0,255,102,0.1)]">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-emerald opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyber-emerald shadow-[0_0_8px_#00FF66]"></span>
+                </span>
+                <span class="text-xs font-bold text-cyber-emerald uppercase tracking-widest">System Live</span>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-8">
+    <main class="max-w-7xl mx-auto p-8 pt-12 pb-24">
         <!-- Dashboard Header -->
-        <div class="mb-10">
-            <h1 class="text-4xl mb-2">Global Nerve Center</h1>
-            <p class="text-[#8B949E]">Real-time volatility monitoring and cross-asset anomaly detection.</p>
+        <div class="mb-12 flex flex-col gap-2">
+            <h1 class="text-5xl font-black text-gradient tracking-tight">Global Nerve Center</h1>
+            <p class="text-slate-400 text-lg max-w-2xl font-light">Real-time volatility monitoring and cross-asset predictive anomaly detection driven by advanced neural models.</p>
         </div>
 
         <!-- Metric Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div class="high-contrast-card p-6 flex justify-between items-center shadow-xl">
+            <div class="glass-card rounded-2xl p-6 flex justify-between items-center group">
                 <div>
-                    <p class="text-xs font-bold text-[#8B949E] uppercase mb-1">Exposure Assets</p>
-                    <h3 class="text-4xl">{{ stats.assets }}</h3>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 group-hover:text-cyber-accent transition-colors">Exposure Assets</p>
+                    <h3 class="text-5xl font-black text-white">{{ stats.assets }}</h3>
                 </div>
-                <div class="bg-[#21262D] p-4 rounded-xl text-[#58A6FF]"><i class="fas fa-layer-group text-2xl"></i></div>
+                <div class="w-16 h-16 rounded-2xl bg-cyber-accent/10 border border-cyber-accent/20 flex items-center justify-center group-hover:bg-cyber-accent/20 transition-all group-hover:rotate-6 shadow-[0_0_20px_rgba(0,240,255,0.1)]">
+                    <i class="fas fa-layer-group text-3xl text-cyber-accent"></i>
+                </div>
             </div>
-            <div class="high-contrast-card p-6 flex justify-between items-center shadow-xl">
+            <div class="glass-card rounded-2xl p-6 flex justify-between items-center group">
                 <div>
-                    <p class="text-xs font-bold text-[#8B949E] uppercase mb-1">Total Datapoints</p>
-                    <h3 class="text-4xl">{{ stats.rows }}</h3>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 group-hover:text-cyber-purple transition-colors">Total Datapoints</p>
+                    <h3 class="text-5xl font-black text-white">{{ stats.rows }}</h3>
                 </div>
-                <div class="bg-[#21262D] p-4 rounded-xl text-[#BC13FE]"><i class="fas fa-microchip text-2xl"></i></div>
+                <div class="w-16 h-16 rounded-2xl bg-cyber-purple/10 border border-cyber-purple/20 flex items-center justify-center group-hover:bg-cyber-purple/20 transition-all group-hover:scale-110 shadow-[0_0_20px_rgba(123,44,191,0.1)]">
+                    <i class="fas fa-microchip text-3xl text-cyber-purple"></i>
+                </div>
             </div>
-            <div class="high-contrast-card p-6 flex justify-between items-center shadow-xl">
+            <div class="glass-card rounded-2xl p-6 flex justify-between items-center group">
                 <div>
-                    <p class="text-xs font-bold text-[#8B949E] uppercase mb-1">Critical Anomalies</p>
-                    <h3 class="text-4xl text-emerald-400">{{ stats.anomalies }}</h3>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 group-hover:text-cyber-emerald transition-colors">Critical Anomalies</p>
+                    <h3 class="text-5xl font-black text-white">{{ stats.anomalies }}</h3>
                 </div>
-                <div class="bg-[#21262D] p-4 rounded-xl text-emerald-400"><i class="fas fa-bolt text-2xl"></i></div>
+                <div class="w-16 h-16 rounded-2xl bg-cyber-emerald/10 border border-cyber-emerald/20 flex items-center justify-center group-hover:bg-cyber-emerald/20 transition-all group-hover:-rotate-6 shadow-[0_0_20px_rgba(0,255,102,0.1)]">
+                    <i class="fas fa-bolt text-3xl text-cyber-emerald drop-shadow-[0_0_8px_#00FF66]"></i>
+                </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Market Heatmap Mockup -->
-            <div class="lg:col-span-2 high-contrast-card p-8">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-2xl font-bold flex items-center gap-3">
-                        <i class="fas fa-fire-flame-curved text-orange-500"></i>
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <!-- Market Heatmap Main Chart -->
+            <div class="xl:col-span-2 glass-card rounded-2xl p-8 flex flex-col">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                    <h2 class="text-2xl font-bold flex items-center gap-3 text-white">
+                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]">
+                            <i class="fas fa-fire-flame-curved text-orange-500"></i>
+                        </div>
                         Market Volatility Pulse
                     </h2>
-                    <div class="flex gap-4">
-                        <button onclick="goToDeepDive()" class="bg-[#21262D] hover:bg-[#30363D] text-[#58A6FF] px-4 py-2 rounded-lg text-sm font-bold border border-[#30363D] transition-all">
-                            <i class="fas fa-magnifying-glass-chart me-2"></i>Deep Dive Analysis
+                    <div class="flex flex-wrap gap-4 w-full sm:w-auto">
+                        <button onclick="goToDeepDive()" class="flex-1 sm:flex-none relative overflow-hidden group bg-white/5 hover:bg-white/10 text-white px-6 py-2.5 rounded-xl text-sm font-semibold border border-white/10 transition-all duration-300">
+                            <div class="absolute inset-0 w-0 bg-cyber-accent/20 group-hover:w-full transition-all duration-500 ease-out"></div>
+                            <span class="relative flex items-center justify-center gap-2">
+                                <i class="fas fa-magnifying-glass-chart text-cyber-accent"></i> Deep Dive
+                            </span>
                         </button>
-                        <select id="assetSelect" class="bg-[#0D1117] border border-[#30363D] rounded-lg px-4 py-2 text-sm text-white" onchange="updateMainChart()">
-                            {% for asset in assets %}
-                            <option value="{{ asset.asset_id }}">{{ asset.name }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="relative flex-1 sm:flex-none">
+                            <select id="assetSelect" class="w-full appearance-none bg-black/50 border border-white/10 rounded-xl px-6 py-2.5 pr-10 text-sm text-white font-semibold outline-none focus:border-cyber-accent focus:ring-1 focus:ring-cyber-accent transition-all shadow-inner" onchange="updateMainChart()">
+                                {% for asset in assets %}
+                                <option value="{{ asset.asset_id }}" class="bg-cyber-base">{{ asset.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></i>
+                        </div>
                     </div>
                 </div>
-                <div class="relative h-[400px]">
+                <div class="relative h-[450px] w-full mt-auto">
+                    <!-- Custom Chart Tooltip styling is handled in JS -->
                     <canvas id="nerveChart"></canvas>
                 </div>
             </div>
 
             <!-- Anomaly Pulse Sidebar -->
-            <div class="high-contrast-card p-8">
-                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
-                    <i class="fas fa-satellite-dish text-emerald-500"></i>
+            <div class="glass-card rounded-2xl p-8 flex flex-col h-full">
+                <h2 class="text-2xl font-bold mb-8 flex items-center gap-3 text-white">
+                    <div class="relative flex items-center justify-center">
+                        <div class="absolute inset-0 bg-cyber-emerald/20 rounded-full animate-ping opacity-50"></div>
+                        <div class="w-10 h-10 rounded-xl bg-cyber-emerald/10 flex items-center justify-center border border-cyber-emerald/20 z-10 shadow-[0_0_15px_rgba(0,255,102,0.15)]">
+                            <i class="fas fa-satellite-dish text-cyber-emerald"></i>
+                        </div>
+                    </div>
                     Anomaly Pulse
                 </h2>
-                <div class="space-y-4">
+                <div class="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar" style="max-height: 500px;">
                     {% for alert in alerts %}
-                    <div class="p-4 bg-[#21262D] border-l-4 border-emerald-500 rounded-lg hover:bg-[#30363D] transition-all cursor-pointer shadow-md group" 
+                    <div class="relative p-5 bg-black/40 border border-white/5 rounded-xl hover:border-cyber-accent/50 transition-all duration-300 cursor-pointer group overflow-hidden" 
                          onclick="window.location.href='/stream#alert-{{ alert.alert_id }}'">
-                        <div class="flex justify-between items-start mb-2">
-                             <span class="text-xs font-black uppercase tracking-tighter text-emerald-400 group-hover:text-emerald-300">PUMP ALERT</span>
-                             <span class="text-[10pt] text-[#8B949E]">#{{ alert.alert_id }}</span>
-                        </div>
-                        <p class="text-sm leading-relaxed mb-3">{{ alert.alert_message }}</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-[#58A6FF] group-hover:underline uppercase">View Reasoning Trace →</span>
-                            <i class="fas fa-chevron-right text-[#30363D] group-hover:text-[#58A6FF] transition-colors"></i>
+                        
+                        <!-- Left colored bar -->
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-cyber-accent shadow-[0_0_10px_#00F0FF] group-hover:w-1.5 transition-all"></div>
+                        
+                        <!-- Glow effect on hover -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-cyber-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-center mb-3">
+                                 <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cyber-accent bg-cyber-accent/10 px-2 py-0.5 rounded-md border border-cyber-accent/20 shadow-[0_0_5px_rgba(0,240,255,0.2)]">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i> Signal
+                                 </span>
+                                 <span class="text-xs font-mono text-slate-500 group-hover:text-slate-300 transition-colors">#{{ alert.alert_id }}</span>
+                            </div>
+                            <h4 class="text-white font-semibold text-sm mb-2 group-hover:text-cyber-accent transition-colors">{{ alert.symbol }} - {{ alert.anomaly_type }}</h4>
+                            <p class="text-sm text-slate-400 leading-relaxed mb-4 line-clamp-2">{{ alert.alert_message }}</p>
+                            <div class="flex justify-between items-center mt-auto pt-2 border-t border-white/5">
+                                <span class="text-xs font-bold text-slate-300 group-hover:text-white transition-colors">Agent Logic Trace</span>
+                                <div class="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-cyber-accent group-hover:text-black transition-all">
+                                    <i class="fas fa-arrow-right text-[10px]"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {% else %}
-                    <p class="text-center text-[#8B949E] py-10">All market signals within normal Z-score range.</p>
+                    <div class="flex flex-col items-center justify-center h-full text-center py-12 opacity-60">
+                        <div class="w-16 h-16 rounded-full border-2 border-dashed border-slate-600 flex items-center justify-center mb-4">
+                            <i class="fas fa-check text-2xl text-slate-500"></i>
+                        </div>
+                        <p class="text-slate-400 font-medium">All market signals stable.<br>Z-score within normal range.</p>
+                    </div>
                     {% endfor %}
                 </div>
-                <button onclick="window.location.href='/config'" class="w-full mt-6 py-4 bg-[#238636] hover:bg-[#2ea043] transition-colors rounded-lg font-bold text-center">
-                    MANAGE THRESHOLDS
+                <button onclick="window.location.href='/config'" class="w-full mt-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-300 rounded-xl text-sm font-bold tracking-widest text-white hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] uppercase relative overflow-hidden group">
+                    <span class="relative z-10">Manage Thresholds</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:animate-[shimmer_1.5s_infinite]"></div>
                 </button>
             </div>
         </div>
     </main>
+
+    <style>
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+    </style>
 
     <script>
         function goToDeepDive() {
             const assetId = document.getElementById('assetSelect').value;
             window.location.href = `/analysis/${assetId}`;
         }
+
+        // Custom Tooltip for Chart.js
+        Chart.defaults.color = '#94A3B8';
+        Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
 
         let myChart;
         async function updateMainChart() {
@@ -140,9 +294,10 @@
             const ctx = document.getElementById('nerveChart').getContext('2d');
             if (myChart) myChart.destroy();
             
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(88, 166, 255, 0.3)');
-            gradient.addColorStop(1, 'rgba(13, 17, 23, 0)');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 450);
+            gradient.addColorStop(0, 'rgba(0, 240, 255, 0.5)'); // cyber-accent
+            gradient.addColorStop(0.5, 'rgba(0, 240, 255, 0.1)');
+            gradient.addColorStop(1, 'rgba(0, 240, 255, 0.0)');
 
             myChart = new Chart(ctx, {
                 type: 'line',
@@ -151,22 +306,55 @@
                     datasets: [{
                         label: 'Price Velocity',
                         data: data.values,
-                        borderColor: '#58A6FF',
+                        borderColor: '#00F0FF',
                         borderWidth: 3,
                         pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#FFF',
+                        pointHoverBorderColor: '#00F0FF',
+                        pointHoverBorderWidth: 3,
                         fill: true,
                         backgroundColor: gradient,
-                        tension: 0.1
+                        tension: 0.4 // Smooth bezier curves
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#8B949E', font: { size: 14 } } },
-                        y: { grid: { color: '#30363D' }, ticks: { color: '#8B949E', font: { size: 14 } } }
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
                     },
-                    plugins: { legend: { display: false } }
+                    scales: {
+                        x: { 
+                            grid: { display: false, drawBorder: false }, 
+                            ticks: { font: { size: 12, weight: '500' }, padding: 10 } 
+                        },
+                        y: { 
+                            grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false, borderDash: [5, 5] }, 
+                            ticks: { font: { size: 12, weight: '500' }, padding: 15 },
+                            border: { display: false }
+                        }
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(17, 17, 17, 0.9)',
+                            titleColor: '#8B949E',
+                            bodyColor: '#FFF',
+                            bodyFont: { size: 16, weight: 'bold' },
+                            padding: 12,
+                            borderColor: 'rgba(0, 240, 255, 0.3)',
+                            borderWidth: 1,
+                            displayColors: false,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
