@@ -59,6 +59,14 @@ CREATE TABLE alerts (
     FOREIGN KEY (anomaly_id) REFERENCES anomalies (anomaly_id)
 );
 
+CREATE TABLE user_feedback (
+    feedback_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 3. Views
 CREATE VIEW view_asset_report AS
 SELECT a.symbol, a.name, p.price_close, p.timestamp
