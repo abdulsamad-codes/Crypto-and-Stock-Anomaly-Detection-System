@@ -6,84 +6,250 @@
     <title>Config | Anomaly.AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            base: '#050505',
+                            card: 'rgba(17, 17, 17, 0.6)',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            accent: '#00F0FF',
+                            purple: '#7B2CBF',
+                            emerald: '#00FF66',
+                            red: '#FF3366',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0D1117; color: #F0F6FC; font-size: 14pt; }
-        .high-contrast-card { background-color: #161B22; border: 1px solid #30363D; border-radius: 12px; }
-        input[type=range] { width: 100%; height: 8px; background: #30363D; border-radius: 5px; appearance: none; }
-        input[type=range]::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; background: #58A6FF; border-radius: 50%; cursor: pointer; }
+        body { 
+            background-color: #050505; 
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        
+        .glass-card {
+            background: var(--tw-colors-cyber-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--tw-colors-cyber-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .glow-blob {
+            position: absolute;
+            filter: blur(120px);
+            opacity: 0.3;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        /* Custom Premium Sliders */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #00F0FF;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.8), inset 0 0 5px rgba(255, 255, 255, 0.8);
+            border: 2px solid white;
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+        
+        .nav-link-active {
+            position: relative;
+            color: #FFF;
+        }
+        .nav-link-active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00F0FF;
+            box-shadow: 0 0 10px #00F0FF;
+            border-radius: 2px;
+        }
     </style>
 </head>
-<body class="min-h-screen">
-    <nav class="bg-[#161B22] border-b border-[#30363D] px-8 py-4 mb-8">
+<body class="min-h-screen relative font-sans antialiased selection:bg-cyber-accent selection:text-black">
+    <!-- Ambient Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+        <div class="glow-blob bg-cyber-emerald w-[500px] h-[500px] top-[10%] right-[10%] animate-blob"></div>
+        <div class="glow-blob bg-cyber-accent w-[400px] h-[400px] bottom-[10%] left-[10%] animate-blob" style="animation-delay: 2s;"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+    </div>
+
+    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/40 px-8 py-5">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4">
-                <i class="fas fa-brain text-4xl text-[#58A6FF]"></i>
-                <span class="text-2xl font-bold uppercase tracking-tight">ANOMALY.AI</span>
+            <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location.href='/'">
+                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <i class="fas fa-brain text-2xl text-cyber-accent"></i>
+                </div>
+                <span class="text-2xl font-extrabold tracking-tight text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
             </div>
-            <div class="flex gap-8 text-lg font-semibold">
-                <a href="/" class="hover:text-[#58A6FF]">Nerve Center</a>
-                <a href="/stream" class="hover:text-[#58A6FF]">Live Stream</a>
-                <a href="/config" class="nav-link-active border-b-2 border-[#58A6FF] text-[#58A6FF] pb-1">Config</a>
+            <div class="flex gap-10 text-sm font-semibold tracking-wide uppercase text-slate-400">
+                <a href="/" class="transition-colors hover:text-white relative group">
+                    Nerve Center
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="/stream" class="transition-colors hover:text-white relative group">
+                    Live Stream
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="/config" class="nav-link-active transition-colors hover:text-white">Config</a>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto p-8">
-        <div class="mb-12">
-            <h1 class="text-4xl font-black mb-4 uppercase">System Config</h1>
-            <p class="text-[#8B949E]">Adjust the sensitivity of the AI models and deployment targets.</p>
+    <main class="max-w-4xl mx-auto p-8 pt-12 pb-24">
+        <div class="mb-14">
+            <h1 class="text-5xl font-black mb-4 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">System Config</h1>
+            <p class="text-slate-400 text-lg font-light">Fine-tune neural thresholds, adjust detection sensitivity, and manage autonomous deployment targets.</p>
         </div>
 
-        <div class="space-y-8">
+        <div class="space-y-10">
             <!-- Detection Thresholds -->
-            <div class="high-contrast-card p-10">
-                <h2 class="text-2xl font-bold mb-8 flex items-center gap-4">
-                    <i class="fas fa-sliders-h text-[#58A6FF]"></i> Model Sensitivity
-                </h2>
-                <div class="space-y-10">
-                    <div>
-                        <div class="flex justify-between mb-4">
-                            <label class="text-xl font-bold">Z-Score Threshold (Standard Deviations)</label>
-                            <span class="text-[#58A6FF] font-mono text-xl">3.5σ</span>
-                        </div>
-                        <input type="range" min="1" max="10" step="0.1" value="3.5">
-                        <p class="text-sm text-[#8B949E] mt-4">Higher values reduce false positives but might miss subtle manipulation.</p>
+            <div class="glass-card rounded-3xl p-10 shadow-2xl relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-cyber-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                <h2 class="text-2xl font-bold mb-10 flex items-center gap-4 text-white relative z-10">
+                    <div class="w-10 h-10 rounded-xl bg-cyber-accent/10 border border-cyber-accent/30 flex items-center justify-center text-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                        <i class="fas fa-sliders-h"></i>
                     </div>
+                    Neural Model Sensitivity
+                </h2>
+                <div class="space-y-12 relative z-10">
                     <div>
-                        <div class="flex justify-between mb-4">
-                            <label class="text-xl font-bold">Anomaly Type: Flash Crash Sensitivity</label>
-                            <span class="text-[#FF3131] font-mono text-xl">CRITICAL</span>
+                        <div class="flex justify-between items-end mb-4">
+                            <div>
+                                <label class="text-lg font-bold text-white block mb-1">Z-Score Threshold</label>
+                                <span class="text-xs font-bold uppercase tracking-widest text-slate-500">Standard Deviations</span>
+                            </div>
+                            <span class="text-cyber-accent font-mono text-2xl font-bold bg-cyber-accent/10 px-3 py-1 rounded-lg border border-cyber-accent/20">3.5σ</span>
                         </div>
-                        <input type="range" min="1" max="10" step="1" value="9">
+                        <div class="relative pt-2">
+                            <!-- Track fill glow -->
+                            <div class="absolute top-4 left-0 h-1 bg-cyber-accent rounded-l-full shadow-[0_0_10px_#00F0FF]" style="width: 35%;"></div>
+                            <input type="range" min="1" max="10" step="0.1" value="3.5">
+                        </div>
+                        <p class="text-sm text-slate-400 mt-4 flex items-center gap-2"><i class="fas fa-info-circle text-cyber-accent/70"></i> Higher values filter noise but risk missing subtle market manipulation.</p>
+                    </div>
+                    
+                    <div class="pt-6 border-t border-white/5">
+                        <div class="flex justify-between items-end mb-4">
+                            <div>
+                                <label class="text-lg font-bold text-white block mb-1">Flash Crash Sensitivity</label>
+                                <span class="text-xs font-bold uppercase tracking-widest text-slate-500">Reaction Velocity</span>
+                            </div>
+                            <span class="text-cyber-red font-black text-xl bg-cyber-red/10 px-3 py-1 rounded-lg border border-cyber-red/20 shadow-[0_0_10px_rgba(255,51,102,0.2)]">CRITICAL [9]</span>
+                        </div>
+                        <div class="relative pt-2">
+                            <!-- Custom Red slider thumb for critical via inline style overlay hack -->
+                            <style>
+                                #crash-slider::-webkit-slider-thumb {
+                                    background: #FF3366;
+                                    box-shadow: 0 0 15px rgba(255, 51, 102, 0.8), inset 0 0 5px rgba(255, 255, 255, 0.8);
+                                }
+                            </style>
+                            <div class="absolute top-4 left-0 h-1 bg-cyber-red rounded-l-full shadow-[0_0_10px_#FF3366]" style="width: 90%;"></div>
+                            <input id="crash-slider" type="range" min="1" max="10" step="1" value="9">
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Notifications -->
-            <div class="high-contrast-card p-10">
-                <h2 class="text-2xl font-bold mb-8 flex items-center gap-4">
-                    <i class="fas fa-tower-broadcast text-[#00FF41]"></i> Notification Channels
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="p-6 bg-[#21262D] rounded-xl border border-[#30363D] flex justify-between items-center">
-                        <div class="flex items-center gap-4">
-                            <i class="fab fa-telegram text-3xl text-[#58A6FF]"></i>
-                            <span class="font-bold">Telegram Bot</span>
-                        </div>
-                        <div class="w-12 h-6 bg-emerald-600 rounded-full relative"><div class="w-4 h-4 bg-white rounded-full absolute right-1 top-1"></div></div>
+            <div class="glass-card rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-cyber-emerald/5 blur-3xl rounded-full"></div>
+                <h2 class="text-2xl font-bold mb-8 flex items-center gap-4 text-white relative z-10">
+                    <div class="w-10 h-10 rounded-xl bg-cyber-emerald/10 border border-cyber-emerald/30 flex items-center justify-center text-cyber-emerald shadow-[0_0_15px_rgba(0,255,102,0.2)]">
+                        <i class="fas fa-tower-broadcast"></i>
                     </div>
-                    <div class="p-6 bg-[#21262D] rounded-xl border border-[#30363D] flex justify-between items-center opacity-50">
-                        <div class="flex items-center gap-4">
-                            <i class="fas fa-envelope text-3xl"></i>
-                            <span class="font-bold">Email Alert</span>
+                    Notification Routing
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                    <!-- Active Toggle -->
+                    <div class="p-6 bg-white/[0.03] rounded-2xl border border-cyber-emerald/30 flex justify-between items-center group cursor-pointer hover:bg-white/[0.05] transition-colors shadow-[0_0_15px_rgba(0,255,102,0.05)]">
+                        <div class="flex items-center gap-5">
+                            <div class="w-12 h-12 rounded-full bg-[#0088cc]/20 flex items-center justify-center">
+                                <i class="fab fa-telegram-plane text-2xl text-[#0088cc]"></i>
+                            </div>
+                            <div>
+                                <span class="font-bold text-white block text-lg">Telegram Bot</span>
+                                <span class="text-xs text-cyber-emerald font-bold tracking-widest uppercase">Connected</span>
+                            </div>
                         </div>
-                        <div class="w-12 h-6 bg-[#30363D] rounded-full relative"><div class="w-4 h-4 bg-white rounded-full absolute left-1 top-1"></div></div>
+                        <div class="w-14 h-7 bg-cyber-emerald rounded-full relative shadow-[0_0_10px_#00FF66] cursor-pointer">
+                            <div class="w-5 h-5 bg-white rounded-full absolute right-1 top-1 shadow-sm"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Inactive Toggle -->
+                    <div class="p-6 bg-white/[0.01] rounded-2xl border border-white/5 flex justify-between items-center group cursor-pointer hover:bg-white/[0.03] transition-colors opacity-60">
+                        <div class="flex items-center gap-5">
+                            <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center">
+                                <i class="fas fa-envelope text-xl text-slate-400"></i>
+                            </div>
+                            <div>
+                                <span class="font-bold text-white block text-lg">Email Alert</span>
+                                <span class="text-xs text-slate-500 font-bold tracking-widest uppercase">Disconnected</span>
+                            </div>
+                        </div>
+                        <div class="w-14 h-7 bg-slate-800 rounded-full relative border border-white/10 cursor-pointer">
+                            <div class="w-5 h-5 bg-slate-400 rounded-full absolute left-1 top-1 shadow-sm"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <button class="w-full py-6 bg-[#238636] hover:bg-[#2ea043] rounded-xl text-2xl font-black uppercase tracking-widest shadow-2xl">
-                Deploy Configuration →
+            <!-- Deploy Button -->
+            <button class="w-full py-6 bg-cyber-emerald/10 hover:bg-cyber-emerald/20 border border-cyber-emerald/30 hover:border-cyber-emerald/60 rounded-2xl text-xl font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(0,255,102,0.1)] text-cyber-emerald hover:text-white transition-all duration-300 relative overflow-hidden group">
+                <span class="relative z-10 flex items-center justify-center gap-4">
+                    Deploy Global Config <i class="fas fa-rocket group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"></i>
+                </span>
+                <div class="absolute inset-0 w-0 bg-cyber-emerald group-hover:w-full transition-all duration-500 ease-out z-0 opacity-20"></div>
             </button>
         </div>
     </main>

@@ -6,85 +6,230 @@
     <title>Reasoning Feed | Anomaly.AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            base: '#050505',
+                            card: 'rgba(17, 17, 17, 0.6)',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            accent: '#00F0FF',
+                            purple: '#7B2CBF',
+                            emerald: '#00FF66',
+                            red: '#FF3366',
+                            orange: '#FF8A00'
+                        }
+                    },
+                    animation: {
+                        'typing': 'typing 2s steps(40, end)',
+                        'blink': 'blink .75s step-end infinite',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        typing: { from: { width: '0' }, to: { width: '100%' } },
+                        blink: { '0%, 100%': { borderColor: 'transparent' }, '50%': { borderColor: '#00F0FF' } },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0D1117; color: #F0F6FC; font-size: 14pt; }
-        .high-contrast-card { background-color: #161B22; border: 1px solid #30363D; border-radius: 12px; }
-        .reasoning-box { font-family: 'JetBrains Mono', monospace; background: #010409; border-left: 2px solid #BC13FE; }
-        .pulse-red { border-left-color: #FF3131; }
-        .pulse-green { border-left-color: #00FF41; }
-        h4 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+        body { 
+            background-color: #050505; 
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        
+        .glass-card {
+            background: var(--tw-colors-cyber-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--tw-colors-cyber-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #FFF 0%, #A0AEC0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-link-active {
+            position: relative;
+            color: #FFF;
+        }
+        .nav-link-active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00F0FF;
+            box-shadow: 0 0 10px #00F0FF;
+            border-radius: 2px;
+        }
+        
+        .glow-blob {
+            position: absolute;
+            filter: blur(120px);
+            opacity: 0.3;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        .terminal-box {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .terminal-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; width: 2px;
+            background: linear-gradient(to bottom, #7B2CBF, #00F0FF);
+            box-shadow: 0 0 10px #00F0FF;
+        }
+        .typewriter p {
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 0;
+            letter-spacing: 0.05em;
+            animation: typing 2s steps(40, end);
+        }
+        /* Delay lines sequentially */
+        .typewriter p:nth-child(1) { animation-delay: 0s; }
+        .typewriter p:nth-child(2) { animation-delay: 0.5s; animation-fill-mode: both; }
+        .typewriter p:nth-child(3) { animation-delay: 1.0s; animation-fill-mode: both; }
+        .typewriter p:nth-child(4) { animation-delay: 1.5s; animation-fill-mode: both; border-right: .15em solid #00F0FF; animation: typing 2s steps(40, end) 1.5s both, blink .75s step-end infinite; }
     </style>
 </head>
-<body class="min-h-screen">
-    <nav class="bg-[#161B22] border-b border-[#30363D] px-8 py-4 sticky top-0 z-50">
+<body class="min-h-screen relative font-sans antialiased selection:bg-cyber-purple selection:text-white">
+    <!-- Ambient Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+        <div class="glow-blob bg-cyber-purple w-[500px] h-[500px] top-[10%] left-[20%] animate-blob"></div>
+        <div class="glow-blob bg-cyber-accent w-[400px] h-[400px] bottom-[10%] right-[10%] animate-blob" style="animation-delay: 2s;"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+    </div>
+
+    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/40 px-8 py-5">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4">
-                <i class="fas fa-brain text-4xl text-[#58A6FF]"></i>
-                <span class="text-2xl font-bold">ANOMALY.AI</span>
+            <div class="flex items-center gap-4 group cursor-pointer">
+                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <i class="fas fa-brain text-2xl text-cyber-accent"></i>
+                </div>
+                <span class="text-2xl font-extrabold tracking-tight text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
             </div>
-            <div class="flex gap-8 text-lg font-semibold">
-                <a href="/" class="hover:text-[#58A6FF]">Nerve Center</a>
-                <a href="/stream" class="nav-link-active border-b-2 border-[#58A6FF] text-[#58A6FF] pb-1">Live Stream</a>
-                <a href="/config" class="hover:text-[#58A6FF]">Config</a>
+            <div class="flex gap-10 text-sm font-semibold tracking-wide uppercase text-slate-400">
+                <a href="/" class="transition-colors hover:text-white relative group">
+                    Nerve Center
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="/stream" class="nav-link-active transition-colors hover:text-white">Live Stream</a>
+                <a href="/config" class="transition-colors hover:text-white relative group">
+                    Config
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                </a>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto p-8">
-        <header class="mb-12">
-            <h1 class="text-4xl font-black mb-4 tracking-tighter uppercase">Live Anomaly Reasoning Stream</h1>
-            <p class="text-[#8B949E] text-xl">Agentic analysis explaining the logic behind every market disruption.</p>
+    <main class="max-w-6xl mx-auto p-8 pt-12 pb-24">
+        <header class="mb-14">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-6 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse"></span>
+                <span class="text-xs font-mono text-slate-300">SYSTEM.LOG_STREAM_ACTIVE</span>
+            </div>
+            <h1 class="text-5xl font-black text-gradient tracking-tight uppercase mb-4">Agent Reasoning Stream</h1>
+            <p class="text-slate-400 text-lg font-light max-w-2xl">Unfiltered logic traces from the neural backend explaining every flagged market anomaly.</p>
         </header>
 
-        <div class="space-y-8">
+        <div class="space-y-10">
             {% for alert in alerts %}
-            <div id="alert-{{ alert.alert_id }}" class="high-contrast-card overflow-hidden hover:border-[#58A6FF] transition-colors group shadow-2xl">
+            <div id="alert-{{ alert.alert_id }}" class="glass-card rounded-2xl overflow-hidden hover:border-cyber-accent/40 transition-all duration-500 shadow-2xl group">
                 <div class="grid grid-cols-1 md:grid-cols-4">
-                    <!-- Left: Metadata -->
-                    <div class="p-6 border-r border-[#30363D] bg-[#21262D] group-hover:bg-[#161B22] transition-colors cursor-pointer" onclick="window.location.href='/analysis/{{ alert.asset_id }}'">
-                        <div class="mb-6">
-                            <span class="text-xs font-black uppercase text-[#8B949E] block mb-1">Asset</span>
-                            <h4 class="text-2xl text-[#58A6FF] flex items-center gap-2">
+                    <!-- Left: Metadata Panel -->
+                    <div class="p-8 border-b md:border-b-0 md:border-r border-white/5 bg-white/[0.02] group-hover:bg-white/[0.04] transition-colors relative" onclick="window.location.href='/analysis/{{ alert.asset_id }}'">
+                        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-cyber-accent/5 to-transparent pointer-events-none"></div>
+                        <div class="mb-8 cursor-pointer relative z-10">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-2">Target Asset</span>
+                            <h4 class="text-3xl font-black text-white flex items-center gap-3">
                                 {{ alert.symbol }}
-                                <i class="fas fa-external-link-alt text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                                    <i class="fas fa-arrow-right text-[10px] text-cyber-accent"></i>
+                                </div>
                             </h4>
                         </div>
-                        <div class="mb-6">
-                            <span class="text-xs font-black uppercase text-[#8B949E] block mb-1">Severity</span>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if alert.severity == 'Critical' %}bg-red-900 text-red-100{% else %}bg-orange-900 text-orange-100{% endif %}">
+                        <div class="mb-8 relative z-10">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-3">Severity Level</span>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded border shadow-sm text-xs font-bold uppercase tracking-wider
+                                {% if alert.severity == 'Critical' %}
+                                bg-cyber-red/10 border-cyber-red/30 text-cyber-red shadow-[0_0_10px_rgba(255,51,102,0.2)]
+                                {% else %}
+                                bg-cyber-orange/10 border-cyber-orange/30 text-cyber-orange shadow-[0_0_10px_rgba(255,138,0,0.2)]
+                                {% endif %}">
+                                <i class="fas {% if alert.severity == 'Critical' %}fa-radiation{% else %}fa-exclamation-triangle{% endif %}"></i>
                                 {{ alert.severity }}
                             </span>
                         </div>
-                        <div>
-                            <span class="text-xs font-black uppercase text-[#8B949E] block mb-1">Detected At</span>
-                            <p class="text-sm">Real-time Feed</p>
+                        <div class="relative z-10">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-2">Event Origin</span>
+                            <p class="text-sm font-mono text-slate-400">Stream [{{ alert.alert_id }}]</p>
                         </div>
                     </div>
 
                     <!-- Right: Logic & Action -->
-                    <div class="col-span-3 p-8">
-                        <h2 class="text-2xl font-bold mb-4 uppercase tracking-tighter">{{ alert.anomaly_type }}</h2>
-                        <p class="text-xl leading-relaxed text-[#F0F6FC] mb-6">
+                    <div class="col-span-3 p-8 flex flex-col">
+                        <h2 class="text-3xl font-bold mb-4 uppercase tracking-tighter text-white">{{ alert.anomaly_type }}</h2>
+                        <p class="text-lg font-light leading-relaxed text-slate-300 mb-8">
                             {{ alert.alert_message }}
                         </p>
 
-                        <div class="reasoning-box p-6 rounded-lg mb-8">
-                            <h5 class="text-xs font-black text-[#8B949E] uppercase mb-4 tracking-widest flex items-center gap-2">
-                                <i class="fas fa-terminal"></i> Agentic Logic Trace
-                            </h5>
-                            <div class="space-y-3 text-[14pt]">
-                                <p class="text-emerald-400">> Analyzing 15m candle volume...</p>
-                                <p class="text-emerald-400">> 3.2x Deviation from 30-day moving average detected.</p>
-                                <p class="text-emerald-400">> Cross-referencing with Social sentiment (X/Telegram)...</p>
-                                <p class="text-emerald-400">> Alert triggered: Signal verified.</p>
+                        <div class="terminal-box rounded-xl p-6 mb-8 mt-auto shadow-inner">
+                            <div class="flex items-center gap-3 mb-5 border-b border-white/5 pb-3">
+                                <div class="flex gap-1.5">
+                                    <div class="w-3 h-3 rounded-full bg-slate-700"></div>
+                                    <div class="w-3 h-3 rounded-full bg-slate-700"></div>
+                                    <div class="w-3 h-3 rounded-full bg-slate-700"></div>
+                                </div>
+                                <h5 class="text-xs font-mono text-slate-400 uppercase tracking-[0.2em]">Agentic Logic Trace</h5>
+                            </div>
+                            <div class="space-y-2.5 font-mono text-sm typewriter">
+                                <p class="text-cyber-emerald"><span class="text-slate-500 mr-2">01</span>> Analyzing 15m candle volume architecture...</p>
+                                <p class="text-cyber-emerald"><span class="text-slate-500 mr-2">02</span>> 3.2x Z-Score deviation from 30-day moving average.</p>
+                                <p class="text-cyber-emerald"><span class="text-slate-500 mr-2">03</span>> Cross-referencing off-chain sentiment (X/Telegram)...</p>
+                                <p class="text-cyber-accent font-bold"><span class="text-slate-500 mr-2 font-normal">04</span>> Alert Triggered: Verification Confirmed.</p>
                             </div>
                         </div>
 
-                        <div class="flex gap-4">
-                            <button class="bg-[#238636] px-8 py-3 rounded-lg font-bold hover:bg-[#2ea043] transition-colors">APPROVE TRADE</button>
-                            <button class="bg-transparent border border-[#30363D] px-8 py-3 rounded-lg font-bold hover:bg-[#21262D]">IGNORE</button>
-                            <button class="bg-[#161B22] border border-[#BC13FE] text-[#BC13FE] px-8 py-3 rounded-lg font-bold">ESCALATE TO HUMAN</button>
+                        <div class="flex flex-wrap gap-4 mt-auto">
+                            <button class="relative overflow-hidden group bg-cyber-emerald/10 hover:bg-cyber-emerald/20 text-cyber-emerald px-8 py-3 rounded-xl text-sm font-bold tracking-wider border border-cyber-emerald/30 transition-all duration-300 shadow-[0_0_15px_rgba(0,255,102,0.1)]">
+                                <div class="absolute inset-0 w-0 bg-cyber-emerald group-hover:w-full transition-all duration-300 ease-out z-0"></div>
+                                <span class="relative z-10 group-hover:text-black transition-colors flex items-center gap-2">
+                                    <i class="fas fa-check"></i> APPROVE TRADE
+                                </span>
+                            </button>
+                            <button class="bg-white/5 border border-white/10 text-slate-300 px-8 py-3 rounded-xl text-sm font-bold tracking-wider hover:bg-white/10 hover:text-white transition-all">
+                                IGNORE
+                            </button>
+                            <button class="bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple hover:bg-cyber-purple/20 px-8 py-3 rounded-xl text-sm font-bold tracking-wider transition-all ml-auto">
+                                ESCALATE TO HUMAN
+                            </button>
                         </div>
                     </div>
                 </div>

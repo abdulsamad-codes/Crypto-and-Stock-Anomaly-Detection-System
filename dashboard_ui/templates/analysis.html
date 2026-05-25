@@ -7,95 +7,208 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            base: '#050505',
+                            card: 'rgba(17, 17, 17, 0.6)',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            accent: '#00F0FF',
+                            purple: '#7B2CBF',
+                            emerald: '#00FF66',
+                            red: '#FF3366',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0D1117; color: #F0F6FC; font-size: 14pt; }
-        .high-contrast-card { background-color: #161B22; border: 1px solid #30363D; border-radius: 12px; }
-        .order-book-red { color: #FF3131; background: rgba(255, 49, 49, 0.1); }
-        .order-book-green { color: #00FF41; background: rgba(0, 255, 65, 0.1); }
-        h1, h2 { font-size: 1.5rem; font-weight: 700; }
+        body { 
+            background-color: #050505; 
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        
+        .glass-card {
+            background: var(--tw-colors-cyber-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--tw-colors-cyber-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .order-book-red { 
+            position: relative;
+            z-index: 1;
+        }
+        .order-book-red::after {
+            content: ''; position: absolute; top: 0; bottom: 0; right: 0;
+            background: rgba(255, 51, 102, 0.15);
+            z-index: -1; border-radius: 4px;
+        }
+        .order-book-green { 
+            position: relative;
+            z-index: 1;
+        }
+        .order-book-green::after {
+            content: ''; position: absolute; top: 0; bottom: 0; right: 0;
+            background: rgba(0, 255, 102, 0.15);
+            z-index: -1; border-radius: 4px;
+        }
+
+        .glow-blob {
+            position: absolute;
+            filter: blur(120px);
+            opacity: 0.3;
+            z-index: -1;
+            border-radius: 50%;
+        }
     </style>
 </head>
-<body class="min-h-screen">
-    <nav class="bg-[#161B22] border-b border-[#30363D] px-8 py-4 mb-8">
+<body class="min-h-screen relative font-sans antialiased selection:bg-cyber-accent selection:text-black">
+    <!-- Ambient Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+        <div class="glow-blob bg-cyber-accent w-[600px] h-[600px] top-[-10%] left-[-10%] animate-blob"></div>
+        <div class="glow-blob bg-cyber-purple w-[400px] h-[400px] bottom-[20%] right-[-10%] animate-blob" style="animation-delay: 3s;"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+    </div>
+
+    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/40 px-8 py-5">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4">
-                <i class="fas fa-brain text-4xl text-[#58A6FF]"></i>
-                <span class="text-2xl font-bold">ANOMALY.AI</span>
+            <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location.href='/'">
+                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <i class="fas fa-brain text-2xl text-cyber-accent"></i>
+                </div>
+                <span class="text-2xl font-extrabold tracking-tight text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
             </div>
-            <div class="flex gap-8 text-lg font-semibold">
-                <a href="/" class="hover:text-[#58A6FF]">Nerve Center</a>
-                <a href="/stream" class="hover:text-[#58A6FF]">Live Stream</a>
-                <a href="/config" class="hover:text-[#58A6FF]">Config</a>
+            <div class="flex gap-10 text-sm font-semibold tracking-wide uppercase text-slate-400">
+                <a href="/" class="transition-colors hover:text-white relative group">
+                    Nerve Center
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="/stream" class="transition-colors hover:text-white relative group">
+                    Live Stream
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="/config" class="transition-colors hover:text-white relative group">
+                    Config
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                </a>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-8">
-        <div class="flex justify-between items-end mb-10">
-            <div>
-                <h1 class="text-5xl font-black tracking-tighter uppercase mb-2">{{ asset.name }} ({{ asset.symbol }})</h1>
-                <p class="text-[#8B949E] text-xl">Technical Analysis & Liquidity Cluster Visualization</p>
+    <main class="max-w-7xl mx-auto p-8 pt-12 pb-24">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+            <div class="relative">
+                <div class="absolute -left-12 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-cyber-accent/20 border border-cyber-accent/40 flex items-center justify-center hidden lg:flex shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <div class="w-3 h-3 bg-cyber-accent rounded-full animate-pulse"></div>
+                </div>
+                <h1 class="text-5xl font-black tracking-tighter uppercase mb-2 text-white drop-shadow-lg">{{ asset.name }} <span class="text-slate-500 font-light">({{ asset.symbol }})</span></h1>
+                <p class="text-slate-400 text-lg">High-Frequency Technical Analysis & Liquidity Cluster Visualization</p>
             </div>
-            <div class="text-right">
-                <span class="text-xs font-black uppercase text-[#8B949E] block mb-1">Current Sector</span>
-                <span class="text-2xl font-bold text-[#58A6FF]">{{ asset.type }}</span>
+            <div class="text-left md:text-right glass-card px-6 py-4 rounded-xl border border-white/10">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-1">Asset Classification</span>
+                <span class="text-xl font-black text-cyber-accent tracking-wider">{{ asset.type }}</span>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- Advanced Candlestick Chart (Chart.js Line) -->
-            <div class="lg:col-span-3 high-contrast-card p-8">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-2xl font-bold flex items-center gap-3">
-                        <i class="fas fa-chart-line text-[#58A6FF]"></i> Price Action (OHLCV)
+            <div class="lg:col-span-3 glass-card rounded-2xl p-8 flex flex-col shadow-2xl">
+                <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
+                    <h2 class="text-2xl font-bold flex items-center gap-3 text-white">
+                        <div class="w-10 h-10 rounded-xl bg-cyber-accent/10 flex items-center justify-center border border-cyber-accent/20">
+                            <i class="fas fa-chart-line text-cyber-accent"></i> 
+                        </div>
+                        Price Action Profile
                     </h2>
                     <div class="flex gap-2">
-                        <span class="px-3 py-1 bg-red-950 text-red-400 border border-red-900 rounded text-xs px-2 py-1 uppercase font-black">Anomaly Detected</span>
+                        <span class="px-3 py-1.5 bg-cyber-red/10 text-cyber-red border border-cyber-red/30 rounded-lg text-xs uppercase font-black tracking-wider flex items-center gap-2 shadow-[0_0_15px_rgba(255,51,102,0.15)]">
+                            <span class="w-2 h-2 rounded-full bg-cyber-red animate-pulse"></span>
+                            Anomaly State
+                        </span>
                     </div>
                 </div>
-                <div class="relative h-[500px]">
+                <div class="relative h-[550px] w-full mt-auto">
                     <canvas id="diveChart"></canvas>
                 </div>
             </div>
 
-            <!-- Order Book Imbalance -->
+            <!-- Sidebar: Order Book & Insights -->
             <div class="space-y-8">
-                <div class="high-contrast-card p-6">
-                    <h2 class="text-xl font-bold mb-6 flex items-center gap-3">
-                        <i class="fas fa-arrows-up-down text-[#BC13FE]"></i> Liquidity
+                <!-- Order Book Imbalance -->
+                <div class="glass-card rounded-2xl p-6 shadow-2xl">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-3 text-white">
+                        <div class="w-8 h-8 rounded-lg bg-cyber-purple/10 flex items-center justify-center border border-cyber-purple/20 text-cyber-purple">
+                            <i class="fas fa-arrows-up-down"></i>
+                        </div>
+                        Liquidity Depth
                     </h2>
-                    <div class="space-y-2 font-mono text-sm uppercase">
-                        <div class="flex justify-between p-2 order-book-red border-r-4 border-red-500">
-                            <span>Sell 34.2 BTC</span>
-                            <span>$65,402</span>
+                    <div class="space-y-1 font-mono text-sm uppercase tracking-wide">
+                        <div class="flex justify-between px-3 py-2 order-book-red border-r-2 border-cyber-red" style="--tw-after-width: 85%;">
+                            <span class="text-slate-300">Sell 34.2</span>
+                            <span class="text-cyber-red font-bold">$65,402</span>
                         </div>
-                        <div class="flex justify-between p-2 order-book-red border-r-4 border-red-500 opacity-75">
-                            <span>Sell 12.5 BTC</span>
-                            <span>$65,390</span>
+                        <div class="flex justify-between px-3 py-2 order-book-red border-r-2 border-cyber-red opacity-80" style="--tw-after-width: 45%;">
+                            <span class="text-slate-300">Sell 12.5</span>
+                            <span class="text-cyber-red font-bold">$65,390</span>
                         </div>
-                        <div class="my-4 py-2 text-center border-y border-[#30363D] font-bold text-xl">
+                        
+                        <div class="my-4 py-3 text-center border-y border-white/10 font-bold text-2xl text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] bg-white/[0.02]">
                             $65,385.20
                         </div>
-                        <div class="flex justify-between p-2 order-book-green border-r-4 border-green-500">
-                            <span>Buy 45.1 BTC</span>
-                            <span>$65,380</span>
+                        
+                        <div class="flex justify-between px-3 py-2 order-book-green border-l-2 border-cyber-emerald" style="--tw-after-width: 95%; text-align: right;">
+                            <span class="text-cyber-emerald font-bold">$65,380</span>
+                            <span class="text-slate-300">Buy 45.1</span>
                         </div>
-                        <div class="flex justify-between p-2 order-book-green border-r-4 border-green-500 opacity-75">
-                            <span>Buy 8.9 BTC</span>
-                            <span>$65,375</span>
+                        <div class="flex justify-between px-3 py-2 order-book-green border-l-2 border-cyber-emerald opacity-80" style="--tw-after-width: 35%; text-align: right;">
+                            <span class="text-cyber-emerald font-bold">$65,375</span>
+                            <span class="text-slate-300">Buy 8.9</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="high-contrast-card p-6 bg-gradient-to-br from-[#161B22] to-[#0D1117] hover:from-[#1c2128] transition-all cursor-pointer shadow-lg" onclick="alert('Insight: Whale activity often precedes major price rebounds in {{ asset.symbol }}. Monitor the $65,000 liquidity cluster.')">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-eye text-emerald-400"></i>
-                        Whale Movement
+                <!-- Whale Movement Insight -->
+                <div class="glass-card rounded-2xl p-6 relative overflow-hidden group cursor-pointer transition-all duration-300 hover:border-cyber-emerald/50 shadow-[0_0_20px_rgba(0,255,102,0.05)]" onclick="alert('Insight: Whale activity often precedes major price rebounds in {{ asset.symbol }}. Monitor the $65,000 liquidity cluster.')">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyber-emerald/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-cyber-emerald/10 blur-2xl rounded-full"></div>
+                    
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white relative z-10">
+                        <i class="fas fa-eye text-cyber-emerald"></i>
+                        Whale Telemetry
                     </h2>
-                    <div class="text-[14pt] leading-relaxed">
-                        <p class="text-[#8B949E]">Detected <span class="text-emerald-400 font-bold">$2M USDC</span> inflow into exchange address <span class="text-[#58A6FF]">0x4f...a3</span></p>
-                        <p class="text-xs mt-4 text-[#58A6FF] font-bold uppercase tracking-widest">Click for Agent Insight →</p>
+                    <div class="text-[14pt] leading-relaxed relative z-10">
+                        <p class="text-slate-300 text-sm">Detected <span class="text-cyber-emerald font-bold bg-cyber-emerald/10 px-1 py-0.5 rounded">$2M USDC</span> inflow into exchange address <span class="text-cyber-accent font-mono">0x4f...a3</span></p>
+                        <div class="mt-6 flex items-center text-xs text-cyber-accent font-bold uppercase tracking-widest group-hover:text-white transition-colors">
+                            Execute Agent Insight <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -103,11 +216,18 @@
     </main>
 
     <script>
+        Chart.defaults.color = '#64748B';
+        Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
+
         async function loadDive() {
             const res = await fetch(`/api/prices/{{ asset.asset_id }}`);
             const data = await res.json();
             const ctx = document.getElementById('diveChart').getContext('2d');
             
+            const gradient = ctx.createLinearGradient(0, 0, 0, 550);
+            gradient.addColorStop(0, 'rgba(0, 240, 255, 0.4)');
+            gradient.addColorStop(1, 'rgba(0, 240, 255, 0.0)');
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -115,26 +235,79 @@
                     datasets: [{
                         label: 'Weighted Price',
                         data: data.values,
-                        borderColor: '#58A6FF',
+                        borderColor: '#00F0FF',
                         borderWidth: 4,
-                        pointBackgroundColor: '#0D1117',
-                        pointBorderColor: '#58A6FF',
-                        pointRadius: 4,
+                        pointBackgroundColor: '#050505',
+                        pointBorderColor: '#00F0FF',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
                         pointHoverRadius: 8,
-                        tension: 0.1
+                        pointHoverBackgroundColor: '#FFF',
+                        fill: true,
+                        backgroundColor: gradient,
+                        tension: 0.3
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
                     scales: {
-                        x: { display: true, grid: { display: false }, ticks: { color: '#8B949E' } },
-                        y: { display: true, grid: { color: '#30363D' }, ticks: { color: '#8B949E' } }
+                        x: { 
+                            display: true, 
+                            grid: { display: false, drawBorder: false }, 
+                            ticks: { font: { size: 12 }, padding: 10 } 
+                        },
+                        y: { 
+                            display: true, 
+                            grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5], drawBorder: false }, 
+                            ticks: { font: { size: 12 }, padding: 15 } 
+                        }
                     },
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(5, 5, 5, 0.9)',
+                            titleColor: '#94A3B8',
+                            bodyColor: '#FFF',
+                            bodyFont: { size: 16, weight: 'bold' },
+                            padding: 12,
+                            borderColor: 'rgba(0, 240, 255, 0.5)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                }
+                            }
+                        }
                     }
                 }
+            });
+            
+            // Adjust order book widths dynamically via JS to match the styling rule
+            const bookRows = document.querySelectorAll('[style*="--tw-after-width"]');
+            bookRows.forEach(row => {
+                const width = row.style.getPropertyValue('--tw-after-width');
+                row.style.setProperty('position', 'relative');
+                const pseudo = document.createElement('div');
+                pseudo.style.position = 'absolute';
+                pseudo.style.top = '0';
+                pseudo.style.bottom = '0';
+                pseudo.style.width = width.trim();
+                pseudo.style.zIndex = '-1';
+                pseudo.style.borderRadius = '2px';
+                if(row.classList.contains('order-book-red')) {
+                    pseudo.style.right = '0';
+                    pseudo.style.backgroundColor = 'rgba(255, 51, 102, 0.15)';
+                } else {
+                    pseudo.style.left = '0';
+                    pseudo.style.backgroundColor = 'rgba(0, 255, 102, 0.15)';
+                }
+                row.appendChild(pseudo);
             });
         }
         window.onload = loadDive;
