@@ -1,6 +1,3 @@
-# User Local Files (Excluded from GitHub)
-User_Files/
-
 # Python Virtual Environments
 .venv/
 venv/
