@@ -102,8 +102,8 @@ def analysis(asset_id):
 def config():
     return render_template('config.html')
 
-@app.route('/classic_php')
-def classic_php_info():
+@app.route('/php_module')
+def php_module_info():
     # Redirecting to the PHP entry point (assuming user runs XAMPP)
     # On Vercel, we can just show a demo message
     return "<h1>Classic PHP Module</h1><p>To view the PHP CRUD, ensure you have XAMPP/WAMP running and access <b>/php_module/index.php</b> directly. This module demonstrates standard index.php and mysqli integration as per lab guidelines.</p><a href='/'>Back to Dashboard</a>"
