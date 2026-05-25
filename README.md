@@ -25,6 +25,7 @@ This project is a final-year Database Systems Lab initiative. It provides an aut
 - **/tools**: Data generation and processing utilities
 
 ## Setup Instructions
+
 1. Clone the repository.
 2. Run `database/schema.sql` and `database/population.sql` in MySQL Workbench.
 3. Install dependencies: `pip install -r requirements.txt`.
@@ -32,7 +33,9 @@ This project is a final-year Database Systems Lab initiative. It provides an aut
 5. Run the dashboard: `python app/app.py`.
 
 ### XAMPP Usage (PHP)
+
 To use the PHP module:
+
 1. Copy the `php_module` folder into your `C:\xampp\htdocs\`.
 2. Start Apache and MySQL in XAMPP.
 3. Access at `http://localhost/php_module/index.php`.
