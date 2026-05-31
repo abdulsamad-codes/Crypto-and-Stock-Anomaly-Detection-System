@@ -104,152 +104,257 @@
     </style>
 </head>
 <body class="min-h-screen relative font-sans antialiased selection:bg-cyber-accent selection:text-black">
+    <!-- Web Audio Cyber Synth Engine -->
+    <script>
+        window.audioEnabled = false;
+        function playCyberSound(type) {
+            if (!window.audioEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                if (type === 'tick') {
+                    // Soft high-tech interface tick
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                } else if (type === 'select') {
+                    // Modern selection hum
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                } else if (type === 'alert') {
+                    // Crimson warning notification pulse
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.4);
+                }
+            } catch (e) {
+                console.error("Audio error", e);
+            }
+        }
+        
+        function toggleAudio() {
+            window.audioEnabled = !window.audioEnabled;
+            const btn = document.getElementById('audioBtn');
+            const icon = btn.querySelector('i');
+            const label = btn.querySelector('span');
+            if (window.audioEnabled) {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-cyber-accent/20 border border-cyber-accent/40 text-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.25)] transition-all";
+                icon.className = "fas fa-volume-up animate-pulse";
+                label.innerText = "Audio: Active";
+                playCyberSound('select');
+            } else {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all";
+                icon.className = "fas fa-volume-mute";
+                label.innerText = "Audio: Muted";
+            }
+        }
+    </script>
+
+    <!-- Dynamic Dynamic Mouse Glow Shadow Overlay -->
+    <div id="mouseGlow" class="fixed pointer-events-none w-[600px] h-[600px] rounded-full bg-cyber-accent/5 blur-[150px] -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-500 z-50"></div>
+
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('mouseGlow');
+            glow.style.opacity = '1';
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mouseleave', () => {
+            document.getElementById('mouseGlow').style.opacity = '0';
+        });
+    </script>
+
     <!-- Ambient Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="glow-blob bg-cyber-accent w-[500px] h-[500px] top-[-10%] left-[-10%] animate-blob"></div>
-        <div class="glow-blob bg-cyber-purple w-[600px] h-[600px] bottom-[-20%] right-[-10%] animate-blob" style="animation-delay: 2s;"></div>
-        <div class="glow-blob bg-cyber-emerald w-[400px] h-[400px] top-[40%] left-[40%] animate-blob opacity-20" style="animation-delay: 4s;"></div>
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        <!-- slow-moving floating keyframe glow elements -->
+        <div class="glow-blob bg-cyber-accent w-[600px] h-[600px] top-[-15%] left-[-15%] opacity-35 animate-[float-slow_25s_infinite_ease-in-out]"></div>
+        <div class="glow-blob bg-cyber-purple w-[700px] h-[700px] bottom-[-20%] right-[-15%] opacity-30 animate-[float-medium_30s_infinite_ease-in-out]"></div>
+        <div class="glow-blob bg-cyber-emerald w-[500px] h-[500px] top-[30%] left-[35%] opacity-15 animate-[float-slow_20s_infinite_ease-in-out]" style="animation-delay: -5s;"></div>
+        <!-- Cybernetic dot matrix grid overlay -->
+        <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.015)_1px,transparent_1px)] [background-size:24px_24px] opacity-80"></div>
     </div>
 
     <!-- Premium Navbar -->
-    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/40 px-8 py-5">
+    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/50 px-8 py-5 border-b border-white/5 shadow-2xl backdrop-blur-xl">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4 group cursor-pointer">
+            <div class="flex items-center gap-4 group cursor-pointer" onclick="playCyberSound('select')">
                 <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 group-hover:border-cyber-accent/60 transition-all duration-500 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
-                    <i class="fas fa-brain text-2xl text-cyber-accent"></i>
+                    <i class="fas fa-brain text-2xl text-cyber-accent group-hover:rotate-12 transition-transform duration-300"></i>
                 </div>
-                <span class="text-2xl font-extrabold tracking-tight text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
+                <span class="text-2xl font-black tracking-wider text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
             </div>
-            <div class="flex gap-10 text-sm font-semibold tracking-wide uppercase text-slate-400">
-                <a href="/" class="nav-link-active transition-colors hover:text-white">Nerve Center</a>
-                <a href="/stream" class="transition-colors hover:text-white relative group">
-                    Live Stream
-                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            
+            <div class="flex gap-10 text-xs font-bold tracking-widest uppercase text-slate-400">
+                <a href="/" onclick="playCyberSound('tick')" class="nav-link-active transition-colors hover:text-white flex items-center gap-1.5 py-1">
+                    <i class="fas fa-network-wired text-cyber-accent"></i> Nerve Center
                 </a>
-                <a href="/config" class="transition-colors hover:text-white relative group">
-                    Config
-                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                <a href="/stream" onclick="playCyberSound('tick')" class="transition-colors hover:text-white relative group flex items-center gap-1.5 py-1">
+                    <i class="fas fa-satellite-dish text-slate-500 group-hover:text-white transition-colors"></i> Live Stream
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyber-accent transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="/config" onclick="playCyberSound('tick')" class="transition-colors hover:text-white relative group flex items-center gap-1.5 py-1">
+                    <i class="fas fa-sliders-h text-slate-500 group-hover:text-white transition-colors"></i> Config
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyber-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
             </div>
-            <div class="flex items-center gap-3 px-4 py-2 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/20 shadow-[0_0_10px_rgba(0,255,102,0.1)]">
-                <span class="relative flex h-2.5 w-2.5">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-emerald opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyber-emerald shadow-[0_0_8px_#00FF66]"></span>
-                </span>
-                <span class="text-xs font-bold text-cyber-emerald uppercase tracking-widest">System Live</span>
+            
+            <div class="flex items-center gap-4">
+                <!-- Audio Feedback Control -->
+                <button id="audioBtn" onclick="toggleAudio()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all shadow-inner">
+                    <i class="fas fa-volume-mute"></i>
+                    <span class="text-xs font-bold tracking-wider uppercase">Audio: Muted</span>
+                </button>
+                
+                <div class="flex items-center gap-3 px-4 py-2 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/20 shadow-[0_0_10px_rgba(0,255,102,0.1)]">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-emerald opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyber-emerald shadow-[0_0_8px_#00FF66]"></span>
+                    </span>
+                    <span class="text-[10px] font-black text-cyber-emerald uppercase tracking-widest">System Online</span>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-8 pt-12 pb-24">
+    <main class="max-w-7xl mx-auto p-8 pt-12 pb-24 relative">
+        <!-- Floating Cyber Grid Element -->
+        <div class="absolute right-8 top-12 opacity-5 pointer-events-none hidden lg:block select-none">
+            <pre class="font-mono text-[9px] leading-tight text-white">
+┌────────────────────────────────────────────────────────┐
+│ [NEURAL ARCHITECTURE SENSITIVITY SYSTEM]               │
+│ CORE: ACTIVE / TARGETING VERIFICATION ENGINE           │
+│ BATCH: 256 / ITERATIONS: 12,042 / PREDICTION: ACTIVE   │
+└────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+
         <!-- Dashboard Header -->
         <div class="mb-12 flex flex-col gap-2">
-            <h1 class="text-5xl font-black text-gradient tracking-tight">Global Nerve Center</h1>
-            <p class="text-slate-400 text-lg max-w-2xl font-light">Real-time volatility monitoring and cross-asset predictive anomaly detection driven by advanced neural models.</p>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-accent/10 border border-cyber-accent/20 w-fit mb-2 shadow-[0_0_15px_rgba(0,240,255,0.05)]">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyber-accent animate-ping"></span>
+                <span class="text-[10px] font-black text-cyber-accent uppercase tracking-widest">Live Volatility Matrix</span>
+            </div>
+            <h1 class="text-6xl font-black text-gradient tracking-tight">Global Nerve Center</h1>
+            <p class="text-slate-400 text-lg max-w-2xl font-light leading-relaxed">Real-time volatility monitoring and cross-asset predictive anomaly detection driven by advanced neural models.</p>
         </div>
 
         <!-- Metric Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div class="glass-card rounded-2xl p-6 flex justify-between items-center group">
-                <div>
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 group-hover:text-cyber-accent transition-colors">Exposure Assets</p>
-                    <h3 class="text-5xl font-black text-white">{{ stats.assets }}</h3>
+            <div class="glass-card rounded-2xl p-6 flex justify-between items-center group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyber-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 group-hover:text-cyber-accent transition-colors">Exposure Assets</p>
+                    <h3 class="text-5xl font-black text-white tracking-tight">{{ stats.assets }}</h3>
                 </div>
-                <div class="w-16 h-16 rounded-2xl bg-cyber-accent/10 border border-cyber-accent/20 flex items-center justify-center group-hover:bg-cyber-accent/20 transition-all group-hover:rotate-6 shadow-[0_0_20px_rgba(0,240,255,0.1)]">
+                <div class="w-16 h-16 rounded-2xl bg-cyber-accent/10 border border-cyber-accent/20 flex items-center justify-center group-hover:bg-cyber-accent/20 transition-all group-hover:rotate-6 shadow-[0_0_20px_rgba(0,240,255,0.1)] relative z-10">
                     <i class="fas fa-layer-group text-3xl text-cyber-accent"></i>
                 </div>
             </div>
-            <div class="glass-card rounded-2xl p-6 flex justify-between items-center group">
-                <div>
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 group-hover:text-cyber-purple transition-colors">Total Datapoints</p>
-                    <h3 class="text-5xl font-black text-white">{{ stats.rows }}</h3>
+            
+            <div class="glass-card rounded-2xl p-6 flex justify-between items-center group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyber-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 group-hover:text-cyber-purple transition-colors">Total Datapoints</p>
+                    <h3 id="datapoints-val" class="text-5xl font-black text-white tracking-tight">{{ stats.rows }}</h3>
                 </div>
-                <div class="w-16 h-16 rounded-2xl bg-cyber-purple/10 border border-cyber-purple/20 flex items-center justify-center group-hover:bg-cyber-purple/20 transition-all group-hover:scale-110 shadow-[0_0_20px_rgba(123,44,191,0.1)]">
+                <div class="w-16 h-16 rounded-2xl bg-cyber-purple/10 border border-cyber-purple/20 flex items-center justify-center group-hover:bg-cyber-purple/20 transition-all group-hover:scale-110 shadow-[0_0_20px_rgba(123,44,191,0.1)] relative z-10">
                     <i class="fas fa-microchip text-3xl text-cyber-purple"></i>
                 </div>
             </div>
-            <div class="glass-card rounded-2xl p-6 flex justify-between items-center group">
-                <div>
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 group-hover:text-cyber-emerald transition-colors">Critical Anomalies</p>
-                    <h3 class="text-5xl font-black text-white">{{ stats.anomalies }}</h3>
+            
+            <div class="glass-card rounded-2xl p-6 flex justify-between items-center group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyber-emerald/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 group-hover:text-cyber-emerald transition-colors">Critical Anomalies</p>
+                    <h3 class="text-5xl font-black text-white tracking-tight flex items-center gap-3">
+                        {{ stats.anomalies }}
+                        <span class="inline-flex h-3 w-3 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-red opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-cyber-red shadow-[0_0_10px_#FF3366]"></span>
+                        </span>
+                    </h3>
                 </div>
-                <div class="w-16 h-16 rounded-2xl bg-cyber-emerald/10 border border-cyber-emerald/20 flex items-center justify-center group-hover:bg-cyber-emerald/20 transition-all group-hover:-rotate-6 shadow-[0_0_20px_rgba(0,255,102,0.1)]">
+                <div class="w-16 h-16 rounded-2xl bg-cyber-emerald/10 border border-cyber-emerald/20 flex items-center justify-center group-hover:bg-cyber-emerald/20 transition-all group-hover:-rotate-6 shadow-[0_0_20px_rgba(0,255,102,0.1)] relative z-10">
                     <i class="fas fa-bolt text-3xl text-cyber-emerald drop-shadow-[0_0_8px_#00FF66]"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Teacher/Lab Verification Portals -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            <div class="glass-card bg-gradient-to-br from-blue-900/40 to-black/40 rounded-2xl p-6 flex justify-between items-center group cursor-pointer border border-blue-500/20 hover:border-blue-500/50" onclick="window.location.href='/php_module'">
-                <div>
-                    <h4 class="text-xl font-bold text-white mb-1 tracking-tight">Classic PHP Portal</h4>
-                    <p class="text-sm text-blue-300/80">Traditional index.php & mysqli CRUD integration as per lab manual.</p>
-                </div>
-                <div class="w-14 h-14 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform">
-                    <i class="fab fa-php text-3xl text-blue-400"></i>
-                </div>
-            </div>
-            <div class="glass-card bg-gradient-to-br from-purple-900/40 to-black/40 rounded-2xl p-6 flex justify-between items-center group cursor-pointer border border-purple-500/20 hover:border-purple-500/50" onclick="alert('Full-Stack Roadmap: We follow the Vite React + Node.js roadmap outlined in Section 03 of the Lab Guide.')">
-                <div>
-                    <h4 class="text-xl font-bold text-white mb-1 tracking-tight">Modern Stack Roadmap</h4>
-                    <p class="text-sm text-purple-300/80">Cross-stack architecture implementing Section 03/04 principles.</p>
-                </div>
-                <div class="w-14 h-14 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 group-hover:scale-110 transition-transform">
-                    <i class="fab fa-react text-3xl text-purple-400"></i>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
             <!-- Market Heatmap Main Chart -->
-            <div class="xl:col-span-2 glass-card rounded-2xl p-8 flex flex-col">
+            <div class="xl:col-span-2 glass-card rounded-2xl p-8 flex flex-col shadow-2xl relative">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                    <h2 class="text-2xl font-bold flex items-center gap-3 text-white">
-                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]">
-                            <i class="fas fa-fire-flame-curved text-orange-500"></i>
+                    <div>
+                        <h2 class="text-2xl font-black flex items-center gap-3 text-white">
+                            <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]">
+                                <i class="fas fa-fire-flame-curved text-orange-500 animate-pulse"></i>
+                            </div>
+                            Market Volatility Pulse
+                        </h2>
+                        <!-- Dynamic simulated price ticker -->
+                        <div id="priceTicker" class="text-2xl font-black font-mono tracking-tight text-white flex items-center gap-2 mt-2">
+                            <div class="h-6 w-32 bg-white/5 rounded animate-pulse"></div>
                         </div>
-                        Market Volatility Pulse
-                    </h2>
-                    <div class="flex flex-wrap gap-4 w-full sm:w-auto">
-                        <button onclick="goToDeepDive()" class="flex-1 sm:flex-none relative overflow-hidden group bg-white/5 hover:bg-white/10 text-white px-6 py-2.5 rounded-xl text-sm font-semibold border border-white/10 transition-all duration-300">
+                    </div>
+
+                    <div class="flex flex-wrap gap-4 w-full sm:w-auto z-10">
+                        <button onclick="playCyberSound('select'); goToDeepDive();" class="flex-1 sm:flex-none relative overflow-hidden group bg-white/5 hover:bg-white/10 text-white px-6 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase border border-white/10 transition-all duration-300">
                             <div class="absolute inset-0 w-0 bg-cyber-accent/20 group-hover:w-full transition-all duration-500 ease-out"></div>
                             <span class="relative flex items-center justify-center gap-2">
                                 <i class="fas fa-magnifying-glass-chart text-cyber-accent"></i> Deep Dive
                             </span>
                         </button>
+                        
                         <div class="relative flex-1 sm:flex-none">
-                            <select id="assetSelect" class="w-full appearance-none bg-black/50 border border-white/10 rounded-xl px-6 py-2.5 pr-10 text-sm text-white font-semibold outline-none focus:border-cyber-accent focus:ring-1 focus:ring-cyber-accent transition-all shadow-inner" onchange="updateMainChart()">
+                            <select id="assetSelect" class="w-full appearance-none bg-black/60 border border-white/10 hover:border-cyber-accent/40 rounded-xl px-6 py-2.5 pr-10 text-xs text-white font-bold tracking-widest uppercase outline-none focus:border-cyber-accent focus:ring-1 focus:ring-cyber-accent transition-all shadow-2xl cursor-pointer" onchange="playCyberSound('select'); updateMainChart();">
                                 {% for asset in assets %}
-                                <option value="{{ asset.asset_id }}" class="bg-cyber-base">{{ asset.name }}</option>
+                                <option value="{{ asset.asset_id }}" class="bg-cyber-base font-sans uppercase font-bold text-xs tracking-widest">{{ asset.name }} ({{ asset.symbol }})</option>
                                 {% endfor %}
                             </select>
-                            <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></i>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[10px]"></i>
                         </div>
                     </div>
                 </div>
+                
                 <div class="relative h-[450px] w-full mt-auto">
-                    <!-- Custom Chart Tooltip styling is handled in JS -->
                     <canvas id="nerveChart"></canvas>
                 </div>
             </div>
 
             <!-- Anomaly Pulse Sidebar -->
-            <div class="glass-card rounded-2xl p-8 flex flex-col h-full">
-                <h2 class="text-2xl font-bold mb-8 flex items-center gap-3 text-white">
+            <div class="glass-card rounded-2xl p-8 flex flex-col h-full shadow-2xl">
+                <h2 class="text-2xl font-black mb-8 flex items-center gap-3 text-white">
                     <div class="relative flex items-center justify-center">
                         <div class="absolute inset-0 bg-cyber-emerald/20 rounded-full animate-ping opacity-50"></div>
                         <div class="w-10 h-10 rounded-xl bg-cyber-emerald/10 flex items-center justify-center border border-cyber-emerald/20 z-10 shadow-[0_0_15px_rgba(0,255,102,0.15)]">
-                            <i class="fas fa-satellite-dish text-cyber-emerald"></i>
+                            <i class="fas fa-satellite-dish text-cyber-emerald animate-pulse"></i>
                         </div>
                     </div>
                     Anomaly Pulse
                 </h2>
-                <div class="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar" style="max-height: 500px;">
+                
+                <div class="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar" style="max-height: 420px;">
                     {% for alert in alerts %}
-                    <div class="relative p-5 bg-black/40 border border-white/5 rounded-xl hover:border-cyber-accent/50 transition-all duration-300 cursor-pointer group overflow-hidden" 
-                         onclick="window.location.href='/stream#alert-{{ alert.alert_id }}'">
+                    <div class="relative p-5 bg-black/45 border border-white/5 rounded-xl hover:border-cyber-accent/60 transition-all duration-300 cursor-pointer group overflow-hidden" 
+                         onclick="playCyberSound('alert'); window.location.href='/stream#alert-{{ alert.alert_id }}'">
                         
                         <!-- Left colored bar -->
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-cyber-accent shadow-[0_0_10px_#00F0FF] group-hover:w-1.5 transition-all"></div>
@@ -259,32 +364,51 @@
 
                         <div class="relative z-10">
                             <div class="flex justify-between items-center mb-3">
-                                 <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cyber-accent bg-cyber-accent/10 px-2 py-0.5 rounded-md border border-cyber-accent/20 shadow-[0_0_5px_rgba(0,240,255,0.2)]">
-                                    <i class="fas fa-exclamation-triangle mr-1"></i> Signal
+                                 <span class="text-[9px] font-black uppercase tracking-[0.2em] text-cyber-accent bg-cyber-accent/10 px-2.5 py-1 rounded border border-cyber-accent/20 shadow-[0_0_5px_rgba(0,240,255,0.2)]">
+                                    <i class="fas fa-radiation mr-1"></i> Signal
                                  </span>
-                                 <span class="text-xs font-mono text-slate-500 group-hover:text-slate-300 transition-colors">#{{ alert.alert_id }}</span>
+                                 <span class="text-[10px] font-mono text-slate-500 group-hover:text-slate-300 transition-colors">ID #{{ alert.alert_id }}</span>
                             </div>
-                            <h4 class="text-white font-semibold text-sm mb-2 group-hover:text-cyber-accent transition-colors">{{ alert.symbol }} - {{ asset_anomaly_type }}</h4>
-                            <p class="text-sm text-slate-400 leading-relaxed mb-4 line-clamp-2">{{ alert.alert_message }}</p>
-                            <div class="flex justify-between items-center mt-auto pt-2 border-t border-white/5">
-                                <span class="text-xs font-bold text-slate-300 group-hover:text-white transition-colors">Agent Logic Trace</span>
+                            <h4 class="text-white font-bold text-sm mb-2 group-hover:text-cyber-accent transition-colors tracking-tight">{{ alert.symbol }} — {{ alert.anomaly_type }}</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed mb-4 line-clamp-2">{{ alert.alert_message }}</p>
+                            <div class="flex justify-between items-center mt-auto pt-2.5 border-t border-white/5">
+                                <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 group-hover:text-slate-300 transition-colors">Agent Reasoning Trace</span>
                                 <div class="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-cyber-accent group-hover:text-black transition-all">
-                                    <i class="fas fa-arrow-right text-[10px]"></i>
+                                    <i class="fas fa-arrow-right text-[9px]"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                     {% else %}
                     <div class="flex flex-col items-center justify-center h-full text-center py-12 opacity-60">
-                        <div class="w-16 h-16 rounded-full border-2 border-dashed border-slate-600 flex items-center justify-center mb-4">
-                            <i class="fas fa-check text-2xl text-slate-500"></i>
+                        <div class="w-16 h-16 rounded-xl bg-cyber-emerald/5 border border-dashed border-cyber-emerald/30 flex items-center justify-center mb-4">
+                            <i class="fas fa-check text-2xl text-cyber-emerald"></i>
                         </div>
-                        <p class="text-slate-400 font-medium">All market signals stable.<br>Z-score within normal range.</p>
+                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">All signals stable</p>
+                        <p class="text-slate-500 text-xs mt-1">Z-score within normal limits.</p>
                     </div>
                     {% endfor %}
                 </div>
-                <button onclick="window.location.href='/config'" class="w-full mt-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-300 rounded-xl text-sm font-bold tracking-widest text-white hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] uppercase relative overflow-hidden group">
-                    <span class="relative z-10">Manage Thresholds</span>
+                
+                <!-- Live Telemetry Monitor Widget -->
+                <div class="mt-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 font-mono text-[10px] text-slate-400 flex flex-col gap-1 shadow-inner relative overflow-hidden">
+                    <div class="absolute right-2 top-2 w-1.5 h-1.5 rounded-full bg-cyber-emerald animate-ping"></div>
+                    <div class="flex justify-between">
+                        <span>MODEL LATENCY</span>
+                        <span class="text-white font-bold">12 ms</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>ENGINE THROUGHPUT</span>
+                        <span id="throughput-val" class="text-white font-bold">4,198 T/s</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Z-SCORE BOUNDARY</span>
+                        <span class="text-cyber-accent font-bold">3.5 &sigma;</span>
+                    </div>
+                </div>
+
+                <button onclick="playCyberSound('select'); window.location.href='/config'" class="w-full mt-4 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-300 rounded-xl text-xs font-black tracking-widest text-white hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] uppercase relative overflow-hidden group">
+                    <span class="relative z-10">Manage Neural Thresholds</span>
                     <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:animate-[shimmer_1.5s_infinite]"></div>
                 </button>
             </div>
@@ -292,12 +416,15 @@
     </main>
 
     <style>
-        @keyframes shimmer {
-            100% {
-                transform: translateX(100%);
-            }
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+            50% { transform: translateY(-30px) translateX(20px) scale(1.05); }
         }
-    </style>
+        @keyframes float-medium {
+            0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+            50% { transform: translateY(40px) translateX(-30px) scale(0.95); }
+        }
+        @keyframes shimmer {
             100% { transform: translateX(100%); }
         }
     </style>
@@ -308,8 +435,8 @@
             window.location.href = `/analysis/${assetId}`;
         }
 
-        // Custom Tooltip for Chart.js
-        Chart.defaults.color = '#94A3B8';
+        // Custom Typography Configuration for Chart.js
+        Chart.defaults.color = 'rgba(255,255,255,0.4)';
         Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
 
         let myChart;
@@ -321,10 +448,16 @@
             const ctx = document.getElementById('nerveChart').getContext('2d');
             if (myChart) myChart.destroy();
             
-            const gradient = ctx.createLinearGradient(0, 0, 0, 450);
-            gradient.addColorStop(0, 'rgba(0, 240, 255, 0.5)'); // cyber-accent
-            gradient.addColorStop(0.5, 'rgba(0, 240, 255, 0.1)');
-            gradient.addColorStop(1, 'rgba(0, 240, 255, 0.0)');
+            // Premium double gradient visual curves
+            const strokeGradient = ctx.createLinearGradient(0, 0, 800, 0);
+            strokeGradient.addColorStop(0, '#00F0FF');
+            strokeGradient.addColorStop(0.5, '#7B2CBF');
+            strokeGradient.addColorStop(1, '#00FF66');
+
+            const fillGradient = ctx.createLinearGradient(0, 0, 0, 450);
+            fillGradient.addColorStop(0, 'rgba(0, 240, 255, 0.35)');
+            fillGradient.addColorStop(0.5, 'rgba(123, 44, 191, 0.08)');
+            fillGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
             myChart = new Chart(ctx, {
                 type: 'line',
@@ -333,16 +466,16 @@
                     datasets: [{
                         label: 'Price Velocity',
                         data: data.values,
-                        borderColor: '#00F0FF',
-                        borderWidth: 3,
+                        borderColor: strokeGradient,
+                        borderWidth: 3.5,
                         pointRadius: 0,
-                        pointHoverRadius: 6,
+                        pointHoverRadius: 7,
                         pointHoverBackgroundColor: '#FFF',
                         pointHoverBorderColor: '#00F0FF',
                         pointHoverBorderWidth: 3,
                         fill: true,
-                        backgroundColor: gradient,
-                        tension: 0.4 // Smooth bezier curves
+                        backgroundColor: fillGradient,
+                        tension: 0.38
                     }]
                 },
                 options: {
@@ -355,26 +488,34 @@
                     scales: {
                         x: { 
                             grid: { display: false, drawBorder: false }, 
-                            ticks: { font: { size: 12, weight: '500' }, padding: 10 } 
+                            ticks: { font: { size: 10, weight: '700' }, padding: 12, color: 'rgba(255,255,255,0.3)' } 
                         },
                         y: { 
-                            grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false, borderDash: [5, 5] }, 
-                            ticks: { font: { size: 12, weight: '500' }, padding: 15 },
+                            grid: { color: 'rgba(255, 255, 255, 0.03)', drawBorder: false, borderDash: [6, 4] }, 
+                            ticks: { 
+                                font: { size: 10, weight: '700' }, 
+                                padding: 16,
+                                color: 'rgba(255,255,255,0.3)',
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString(undefined, {maximumFractionDigits:0});
+                                }
+                            },
                             border: { display: false }
                         }
                     },
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(17, 17, 17, 0.9)',
+                            backgroundColor: 'rgba(5, 5, 10, 0.95)',
                             titleColor: '#8B949E',
+                            titleFont: { size: 11, weight: '700' },
                             bodyColor: '#FFF',
-                            bodyFont: { size: 16, weight: 'bold' },
-                            padding: 12,
+                            bodyFont: { size: 15, weight: '800', family: 'monospace' },
+                            padding: 14,
                             borderColor: 'rgba(0, 240, 255, 0.3)',
-                            borderWidth: 1,
+                            borderWidth: 1.5,
                             displayColors: false,
-                            cornerRadius: 8,
+                            cornerRadius: 10,
                             callbacks: {
                                 label: function(context) {
                                     return '$' + context.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -384,6 +525,59 @@
                     }
                 }
             });
+
+            // Live Simulator ticks
+            if (window.livePriceInterval) clearInterval(window.livePriceInterval);
+
+            let dataPoints = [...data.values];
+            let dataLabels = [...data.labels];
+            let lastPrice = dataPoints[dataPoints.length - 1] || 0;
+            const tickerEl = document.getElementById('priceTicker');
+
+            tickerEl.innerHTML = `
+                $${lastPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} 
+                <span class="text-[9px] font-black text-cyber-emerald flex items-center gap-1 bg-cyber-emerald/10 px-2 py-0.5 rounded border border-cyber-emerald/20 shadow-[0_0_8px_rgba(0,255,102,0.1)] tracking-widest"><i class="fas fa-caret-up"></i> LIVE TICKER</span>
+            `;
+
+            window.livePriceInterval = setInterval(() => {
+                // Synthesize soft high-frequency click tick sound
+                playCyberSound('tick');
+
+                const pct = (Math.random() - 0.485) * 0.0006; // slight volatility walk
+                const diff = lastPrice * pct;
+                lastPrice += diff;
+                
+                // Update final array price point
+                dataPoints[dataPoints.length - 1] = lastPrice;
+                
+                const isUp = diff >= 0;
+                tickerEl.innerHTML = `
+                    $${lastPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                    <span class="text-[9px] font-black ${isUp ? 'text-cyber-emerald bg-cyber-emerald/10 border-cyber-emerald/20' : 'text-cyber-red bg-cyber-red/10 border-cyber-red/20'} flex items-center gap-0.5 px-2 py-0.5 rounded border shadow-inner tracking-widest">
+                        <i class="fas ${isUp ? 'fa-caret-up' : 'fa-caret-down'}"></i>
+                        ${isUp ? '+' : ''}${(pct * 100).toFixed(4)}%
+                    </span>
+                `;
+                
+                // Live tick metrics counter
+                const datapointsValEl = document.getElementById('datapoints-val');
+                if (datapointsValEl) {
+                    let currentCount = parseInt(datapointsValEl.innerText.replace(/,/g, ''));
+                    if (!isNaN(currentCount)) {
+                        currentCount += 1;
+                        datapointsValEl.innerText = currentCount.toLocaleString();
+                    }
+                }
+
+                const throughputValEl = document.getElementById('throughput-val');
+                if (throughputValEl) {
+                    const newThroughput = Math.floor(4000 + Math.random() * 400);
+                    throughputValEl.innerText = `${newThroughput.toLocaleString()} T/s`;
+                }
+                
+                myChart.data.datasets[0].data = dataPoints;
+                myChart.update('none'); // silent update prevents chart jittering
+            }, 3000);
         }
         window.onload = updateMainChart;
     </script>

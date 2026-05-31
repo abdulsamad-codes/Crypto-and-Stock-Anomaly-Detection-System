@@ -91,39 +91,145 @@
     </style>
 </head>
 <body class="min-h-screen relative font-sans antialiased selection:bg-cyber-accent selection:text-black">
+    <!-- Web Audio Cyber Synth Engine (Inherited Client-Side) -->
+    <script>
+        window.audioEnabled = localStorage.getItem('audioEnabled') === 'true';
+        function playCyberSound(type) {
+            if (!window.audioEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                if (type === 'tick') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                } else if (type === 'select') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                } else if (type === 'alert') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.4);
+                }
+            } catch (e) {
+                console.error("Audio error", e);
+            }
+        }
+        
+        function toggleAudio() {
+            window.audioEnabled = !window.audioEnabled;
+            localStorage.setItem('audioEnabled', window.audioEnabled);
+            const btn = document.getElementById('audioBtn');
+            const icon = btn.querySelector('i');
+            const label = btn.querySelector('span');
+            if (window.audioEnabled) {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-cyber-accent/20 border border-cyber-accent/40 text-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.25)] transition-all";
+                icon.className = "fas fa-volume-up animate-pulse";
+                label.innerText = "Audio: Active";
+                playCyberSound('select');
+            } else {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all";
+                icon.className = "fas fa-volume-mute";
+                label.innerText = "Audio: Muted";
+            }
+        }
+        
+        // Initialize navbar audio button state on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('audioBtn');
+            const icon = btn.querySelector('i');
+            const label = btn.querySelector('span');
+            if (window.audioEnabled) {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-cyber-accent/20 border border-cyber-accent/40 text-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.25)] transition-all";
+                icon.className = "fas fa-volume-up animate-pulse";
+                label.innerText = "Audio: Active";
+            }
+        });
+    </script>
+
+    <!-- Dynamic Mouse Glow Overlay -->
+    <div id="mouseGlow" class="fixed pointer-events-none w-[600px] h-[600px] rounded-full bg-cyber-accent/5 blur-[150px] -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-500 z-50"></div>
+
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('mouseGlow');
+            glow.style.opacity = '1';
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mouseleave', () => {
+            document.getElementById('mouseGlow').style.opacity = '0';
+        });
+    </script>
+
     <!-- Ambient Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="glow-blob bg-cyber-accent w-[600px] h-[600px] top-[-10%] left-[-10%] animate-blob"></div>
-        <div class="glow-blob bg-cyber-purple w-[400px] h-[400px] bottom-[20%] right-[-10%] animate-blob" style="animation-delay: 3s;"></div>
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        <div class="glow-blob bg-cyber-accent w-[600px] h-[600px] top-[-10%] left-[-10%] animate-[float-slow_25s_infinite_ease-in-out]"></div>
+        <div class="glow-blob bg-cyber-purple w-[500px] h-[500px] bottom-[20%] right-[-10%] animate-[float-medium_20s_infinite_ease-in-out]" style="animation-delay: 3s;"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.015)_1px,transparent_1px)] [background-size:24px_24px] opacity-80"></div>
     </div>
 
-    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/40 px-8 py-5">
+    <!-- Premium Navbar -->
+    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/50 px-8 py-5 border-b border-white/5 shadow-2xl backdrop-blur-xl">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location.href='/'">
-                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
-                    <i class="fas fa-brain text-2xl text-cyber-accent"></i>
+            <div class="flex items-center gap-4 group cursor-pointer" onclick="playCyberSound('select'); window.location.href='/'">
+                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 group-hover:border-cyber-accent/60 transition-all duration-500 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <i class="fas fa-brain text-2xl text-cyber-accent group-hover:rotate-12 transition-transform duration-300"></i>
                 </div>
-                <span class="text-2xl font-extrabold tracking-tight text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
+                <span class="text-2xl font-black tracking-wider text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
             </div>
-            <div class="flex gap-10 text-sm font-semibold tracking-wide uppercase text-slate-400">
-                <a href="/" class="transition-colors hover:text-white relative group">
-                    Nerve Center
-                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            
+            <div class="flex gap-10 text-xs font-bold tracking-widest uppercase text-slate-400">
+                <a href="/" onclick="playCyberSound('tick')" class="transition-colors hover:text-white relative group flex items-center gap-1.5 py-1">
+                    <i class="fas fa-network-wired text-slate-500 group-hover:text-white transition-colors"></i> Nerve Center
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyber-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a href="/stream" class="transition-colors hover:text-white relative group">
-                    Live Stream
-                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                <a href="/stream" onclick="playCyberSound('tick')" class="transition-colors hover:text-white relative group flex items-center gap-1.5 py-1">
+                    <i class="fas fa-satellite-dish text-slate-500 group-hover:text-white transition-colors"></i> Live Stream
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyber-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a href="/config" class="transition-colors hover:text-white relative group">
-                    Config
-                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                <a href="/config" onclick="playCyberSound('tick')" class="transition-colors hover:text-white relative group flex items-center gap-1.5 py-1">
+                    <i class="fas fa-sliders-h text-slate-500 group-hover:text-white transition-colors"></i> Config
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyber-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Audio Feedback Control -->
+                <button id="audioBtn" onclick="toggleAudio()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all shadow-inner">
+                    <i class="fas fa-volume-mute"></i>
+                    <span class="text-xs font-bold tracking-wider uppercase">Audio: Muted</span>
+                </button>
+                
+                <div class="flex items-center gap-3 px-4 py-2 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/20 shadow-[0_0_10px_rgba(0,255,102,0.1)]">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-emerald opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyber-emerald shadow-[0_0_8px_#00FF66]"></span>
+                    </span>
+                    <span class="text-[10px] font-black text-cyber-emerald uppercase tracking-widest">System Online</span>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-8 pt-12 pb-24">
+    <main class="max-w-7xl mx-auto p-8 pt-12 pb-24 relative">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
             <div class="relative">
                 <div class="absolute -left-12 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-cyber-accent/20 border border-cyber-accent/40 flex items-center justify-center hidden lg:flex shadow-[0_0_15px_rgba(0,240,255,0.2)]">
@@ -133,8 +239,8 @@
                 <p class="text-slate-400 text-lg">High-Frequency Technical Analysis & Liquidity Cluster Visualization</p>
             </div>
             <div class="text-left md:text-right glass-card px-6 py-4 rounded-xl border border-white/10">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-1">Asset Classification</span>
-                <span class="text-xl font-black text-cyber-accent tracking-wider">{{ asset.type }}</span>
+                <span class="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-1">Asset Classification</span>
+                <span class="text-xl font-black text-cyber-accent tracking-wider uppercase">{{ asset.type }}</span>
             </div>
         </div>
 
@@ -143,15 +249,15 @@
             <div class="lg:col-span-3 glass-card rounded-2xl p-8 flex flex-col shadow-2xl">
                 <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
                     <h2 class="text-2xl font-bold flex items-center gap-3 text-white">
-                        <div class="w-10 h-10 rounded-xl bg-cyber-accent/10 flex items-center justify-center border border-cyber-accent/20">
+                        <div class="w-10 h-10 rounded-xl bg-cyber-accent/10 flex items-center justify-center border border-cyber-accent/20 shadow-[0_0_15px_rgba(0,240,255,0.1)]">
                             <i class="fas fa-chart-line text-cyber-accent"></i> 
                         </div>
                         Price Action Profile
                     </h2>
                     <div class="flex gap-2">
-                        <span class="px-3 py-1.5 bg-cyber-red/10 text-cyber-red border border-cyber-red/30 rounded-lg text-xs uppercase font-black tracking-wider flex items-center gap-2 shadow-[0_0_15px_rgba(255,51,102,0.15)]">
+                        <span class="px-3 py-1.5 bg-cyber-red/10 text-cyber-red border border-cyber-red/30 rounded-lg text-[9px] uppercase font-black tracking-widest flex items-center gap-2 shadow-[0_0_15px_rgba(255,51,102,0.15)]">
                             <span class="w-2 h-2 rounded-full bg-cyber-red animate-pulse"></span>
-                            Anomaly State
+                            Anomaly State Verification
                         </span>
                     </div>
                 </div>
@@ -164,31 +270,32 @@
             <div class="space-y-8">
                 <!-- Order Book Imbalance -->
                 <div class="glass-card rounded-2xl p-6 shadow-2xl">
-                    <h2 class="text-xl font-bold mb-6 flex items-center gap-3 text-white">
+                    <h2 class="text-xl font-black mb-6 flex items-center gap-3 text-white">
                         <div class="w-8 h-8 rounded-lg bg-cyber-purple/10 flex items-center justify-center border border-cyber-purple/20 text-cyber-purple">
                             <i class="fas fa-arrows-up-down"></i>
                         </div>
                         Liquidity Depth
                     </h2>
-                    <div class="space-y-1 font-mono text-sm uppercase tracking-wide">
-                        <div class="flex justify-between px-3 py-2 order-book-red border-r-2 border-cyber-red" style="--tw-after-width: 85%;">
+                    
+                    <div class="space-y-1 font-mono text-xs uppercase tracking-wider relative overflow-hidden">
+                        <div class="flex justify-between px-3 py-2.5 order-book-red border-r-2 border-cyber-red" style="--tw-after-width: 85%;">
                             <span class="text-slate-300">Sell 34.2</span>
                             <span class="text-cyber-red font-bold">$65,402</span>
                         </div>
-                        <div class="flex justify-between px-3 py-2 order-book-red border-r-2 border-cyber-red opacity-80" style="--tw-after-width: 45%;">
+                        <div class="flex justify-between px-3 py-2.5 order-book-red border-r-2 border-cyber-red opacity-80" style="--tw-after-width: 45%;">
                             <span class="text-slate-300">Sell 12.5</span>
                             <span class="text-cyber-red font-bold">$65,390</span>
                         </div>
                         
-                        <div class="my-4 py-3 text-center border-y border-white/10 font-bold text-2xl text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] bg-white/[0.02]">
+                        <div class="my-4 py-3 text-center border-y border-white/15 font-bold text-2xl text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] bg-white/[0.02]">
                             $65,385.20
                         </div>
                         
-                        <div class="flex justify-between px-3 py-2 order-book-green border-l-2 border-cyber-emerald" style="--tw-after-width: 95%; text-align: right;">
+                        <div class="flex justify-between px-3 py-2.5 order-book-green border-l-2 border-cyber-emerald" style="--tw-after-width: 95%; text-align: right;">
                             <span class="text-cyber-emerald font-bold">$65,380</span>
                             <span class="text-slate-300">Buy 45.1</span>
                         </div>
-                        <div class="flex justify-between px-3 py-2 order-book-green border-l-2 border-cyber-emerald opacity-80" style="--tw-after-width: 35%; text-align: right;">
+                        <div class="flex justify-between px-3 py-2.5 order-book-green border-l-2 border-cyber-emerald opacity-80" style="--tw-after-width: 35%; text-align: right;">
                             <span class="text-cyber-emerald font-bold">$65,375</span>
                             <span class="text-slate-300">Buy 8.9</span>
                         </div>
@@ -196,11 +303,11 @@
                 </div>
 
                 <!-- Whale Movement Insight -->
-                <div class="glass-card rounded-2xl p-6 relative overflow-hidden group cursor-pointer transition-all duration-300 hover:border-cyber-emerald/50 shadow-[0_0_20px_rgba(0,255,102,0.05)]" onclick="alert('Insight: Whale activity often precedes major price rebounds in {{ asset.symbol }}. Monitor the $65,000 liquidity cluster.')">
+                <div class="glass-card rounded-2xl p-6 relative overflow-hidden group cursor-pointer transition-all duration-300 hover:border-cyber-emerald/50 shadow-[0_0_20px_rgba(0,255,102,0.05)]" onclick="playCyberSound('select'); alert('Insight: Whale activity often precedes major price rebounds in {{ asset.symbol }}. Monitor the $65,000 liquidity cluster.')">
                     <div class="absolute inset-0 bg-gradient-to-br from-cyber-emerald/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                     <div class="absolute right-0 top-0 w-24 h-24 bg-cyber-emerald/10 blur-2xl rounded-full"></div>
                     
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white relative z-10">
+                    <h2 class="text-xl font-black mb-4 flex items-center gap-2 text-white relative z-10">
                         <i class="fas fa-eye text-cyber-emerald"></i>
                         Whale Telemetry
                     </h2>
@@ -213,10 +320,67 @@
                 </div>
             </div>
         </div>
+
+        <!-- Predictive Anomaly Simulator Sandbox Widget -->
+        <div class="glass-card rounded-3xl p-10 mt-12 shadow-2xl relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-cyber-purple/5 to-transparent opacity-50 pointer-events-none"></div>
+            <div class="absolute right-0 top-0 w-64 h-64 bg-cyber-purple/5 blur-3xl rounded-full"></div>
+            
+            <h2 class="text-2xl font-black mb-6 flex items-center gap-3 text-white">
+                <div class="w-10 h-10 rounded-xl bg-cyber-purple/10 flex items-center justify-center border border-cyber-purple/20 text-cyber-purple shadow-[0_0_15px_rgba(123,44,191,0.2)]">
+                    <i class="fas fa-microchip animate-pulse"></i>
+                </div>
+                Neural Engine Predictive Simulation Sandbox
+            </h2>
+            <p class="text-xs text-slate-400 mb-8 max-w-2xl leading-relaxed">
+                Manually simulate high-frequency price shifts and spikes to verify threshold consensus boundaries. Drag sliders to trigger real-time AI classification warnings.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Sliders -->
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-black uppercase tracking-wider text-slate-400">Price Deviation Shift</label>
+                            <span id="sandbox-price-val" class="font-mono text-xs font-bold text-cyber-accent bg-cyber-accent/10 px-2 py-0.5 rounded">0.0%</span>
+                        </div>
+                        <input type="range" id="sandbox-price" min="-15" max="15" step="0.5" value="0" class="w-full" oninput="runSandboxSim()">
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-black uppercase tracking-wider text-slate-400">Volume Multiplier (vs 30d Avg)</label>
+                            <span id="sandbox-volume-val" class="font-mono text-xs font-bold text-cyber-purple bg-cyber-purple/10 px-2 py-0.5 rounded">1.0x</span>
+                        </div>
+                        <input type="range" id="sandbox-volume" min="1" max="10" step="0.5" value="1" class="w-full" oninput="runSandboxSim()">
+                    </div>
+                </div>
+                
+                <!-- Simulated Output Terminal -->
+                <div class="p-6 bg-black/60 rounded-2xl border border-white/5 flex flex-col justify-between min-h-[160px] relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0),rgba(255,255,255,0.01)_50%,rgba(255,255,255,0)_50%)] bg-[size:100%_4px] pointer-events-none"></div>
+                    
+                    <div class="flex justify-between items-center border-b border-white/5 pb-2 mb-4 font-mono text-[9px] text-slate-500 uppercase tracking-widest">
+                        <span>SIMULATION OUTPUT MATRIX</span>
+                        <span class="text-cyber-accent animate-pulse">● LOGGING ACTIVE</span>
+                    </div>
+                    
+                    <div class="font-mono text-xs space-y-2">
+                        <div>ESTIMATED Z-SCORE: <span id="sandbox-score" class="font-bold text-white">0.00 &sigma;</span></div>
+                        <div>PREDICTED STATUS: <span id="sandbox-status" class="font-bold text-cyber-emerald bg-cyber-emerald/10 border border-cyber-emerald/20 px-2.5 py-0.5 rounded">STABLE</span></div>
+                    </div>
+                    
+                    <div id="sandbox-alert-badge" class="mt-4 px-4 py-2.5 rounded-xl bg-white/5 border border-white/5 flex items-center gap-3 text-xs font-bold text-slate-500 uppercase tracking-widest transition-all">
+                        <i class="fas fa-shield-halved"></i>
+                        System within normal margins
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
-        Chart.defaults.color = '#64748B';
+        Chart.defaults.color = 'rgba(255,255,255,0.3)';
         Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
 
         async function loadDive() {
@@ -224,9 +388,16 @@
             const data = await res.json();
             const ctx = document.getElementById('diveChart').getContext('2d');
             
-            const gradient = ctx.createLinearGradient(0, 0, 0, 550);
-            gradient.addColorStop(0, 'rgba(0, 240, 255, 0.4)');
-            gradient.addColorStop(1, 'rgba(0, 240, 255, 0.0)');
+            // Neon gradient strokes
+            const strokeGradient = ctx.createLinearGradient(0, 0, 800, 0);
+            strokeGradient.addColorStop(0, '#00F0FF');
+            strokeGradient.addColorStop(0.5, '#7B2CBF');
+            strokeGradient.addColorStop(1, '#FF3366');
+
+            const fillGradient = ctx.createLinearGradient(0, 0, 0, 550);
+            fillGradient.addColorStop(0, 'rgba(0, 240, 255, 0.35)');
+            fillGradient.addColorStop(0.5, 'rgba(123, 44, 191, 0.08)');
+            fillGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
             new Chart(ctx, {
                 type: 'line',
@@ -235,17 +406,17 @@
                     datasets: [{
                         label: 'Weighted Price',
                         data: data.values,
-                        borderColor: '#00F0FF',
-                        borderWidth: 4,
+                        borderColor: strokeGradient,
+                        borderWidth: 3.5,
                         pointBackgroundColor: '#050505',
                         pointBorderColor: '#00F0FF',
                         pointBorderWidth: 2,
-                        pointRadius: 5,
+                        pointRadius: 4,
                         pointHoverRadius: 8,
                         pointHoverBackgroundColor: '#FFF',
                         fill: true,
-                        backgroundColor: gradient,
-                        tension: 0.3
+                        backgroundColor: fillGradient,
+                        tension: 0.35
                     }]
                 },
                 options: {
@@ -259,25 +430,33 @@
                         x: { 
                             display: true, 
                             grid: { display: false, drawBorder: false }, 
-                            ticks: { font: { size: 12 }, padding: 10 } 
+                            ticks: { font: { size: 10, weight: '700' }, color: 'rgba(255,255,255,0.3)', padding: 12 } 
                         },
                         y: { 
                             display: true, 
-                            grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5], drawBorder: false }, 
-                            ticks: { font: { size: 12 }, padding: 15 } 
+                            grid: { color: 'rgba(255,255,255,0.03)', borderDash: [6, 4], drawBorder: false }, 
+                            ticks: { 
+                                font: { size: 10, weight: '700' }, 
+                                color: 'rgba(255,255,255,0.3)', 
+                                padding: 16,
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString(undefined, {maximumFractionDigits:0});
+                                }
+                            } 
                         }
                     },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(5, 5, 5, 0.9)',
-                            titleColor: '#94A3B8',
+                            backgroundColor: 'rgba(5, 5, 10, 0.95)',
+                            titleColor: '#8B949E',
+                            titleFont: { size: 11, weight: '700' },
                             bodyColor: '#FFF',
-                            bodyFont: { size: 16, weight: 'bold' },
-                            padding: 12,
-                            borderColor: 'rgba(0, 240, 255, 0.5)',
-                            borderWidth: 1,
-                            cornerRadius: 8,
+                            bodyFont: { size: 15, weight: '800', family: 'monospace' },
+                            padding: 14,
+                            borderColor: 'rgba(0, 240, 255, 0.3)',
+                            borderWidth: 1.5,
+                            cornerRadius: 10,
                             callbacks: {
                                 label: function(context) {
                                     return '$' + context.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -302,15 +481,118 @@
                 pseudo.style.borderRadius = '2px';
                 if(row.classList.contains('order-book-red')) {
                     pseudo.style.right = '0';
-                    pseudo.style.backgroundColor = 'rgba(255, 51, 102, 0.15)';
+                    pseudo.style.backgroundColor = 'rgba(255, 51, 102, 0.12)';
                 } else {
                     pseudo.style.left = '0';
-                    pseudo.style.backgroundColor = 'rgba(0, 255, 102, 0.15)';
+                    pseudo.style.backgroundColor = 'rgba(0, 255, 102, 0.12)';
                 }
                 row.appendChild(pseudo);
             });
+
+            // Order Book real-time simulation tick
+            setInterval(() => {
+                const activePriceEl = document.querySelector('.my-4.py-3.text-center');
+                if (!activePriceEl) return;
+                
+                let activePrice = parseFloat(activePriceEl.innerText.replace(/[$,]/g, ''));
+                if (isNaN(activePrice)) return;
+                
+                playCyberSound('tick');
+                
+                const diff = (Math.random() - 0.5) * 1.5;
+                activePrice += diff;
+                activePriceEl.innerText = `$${activePrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                
+                // Wiggle widths and amounts
+                bookRows.forEach((row, i) => {
+                    const delta = (Math.random() - 0.5) * 5;
+                    let originalWidth = parseInt(row.getAttribute('data-w') || 60);
+                    if (!row.hasAttribute('data-w')) {
+                        originalWidth = parseInt(row.style.getPropertyValue('--tw-after-width')) || 60;
+                    }
+                    let newWidth = Math.max(10, Math.min(98, originalWidth + delta));
+                    row.setAttribute('data-w', newWidth);
+                    
+                    const overlay = row.querySelector('div[style*="absolute"]');
+                    if (overlay) overlay.style.width = `${newWidth}%`;
+                    
+                    const qtySpan = row.querySelector('.text-slate-300');
+                    if (qtySpan) {
+                        let matches = qtySpan.innerText.match(/[\d.]+/);
+                        if (matches) {
+                            let qty = parseFloat(matches[0]);
+                            qty = Math.max(1.0, qty + (Math.random() - 0.5) * 2.0);
+                            qtySpan.innerText = `${row.classList.contains('order-book-red') ? 'Sell' : 'Buy'} ${qty.toFixed(1)}`;
+                        }
+                    }
+                    
+                    const priceSpan = row.querySelector('.font-bold');
+                    if (priceSpan) {
+                        let offset = (i + 1) * 3 * (row.classList.contains('order-book-red') ? 1 : -1);
+                        priceSpan.innerText = `$${Math.round(activePrice + offset).toLocaleString()}`;
+                    }
+                });
+            }, 1800);
+
+            // Whale movement simulation tick
+            const telemetryEl = document.querySelector('.text-\\[14pt\\]');
+            if (telemetryEl) {
+                setInterval(() => {
+                    const value = Math.floor(1 + Math.random() * 5);
+                    const coins = ['USDC', 'USDT', 'BTC', 'ETH'];
+                    const coin = coins[Math.floor(Math.random() * coins.length)];
+                    const hexes = ['0x4f...a3', '0x8b...7c', '0x1c...4f', '0xe9...d2'];
+                    const hex = hexes[Math.floor(Math.random() * hexes.length)];
+                    
+                    telemetryEl.innerHTML = `
+                        <p class="text-slate-300 text-sm animate-pulse">Detected <span class="text-cyber-emerald font-bold bg-cyber-emerald/10 px-1 py-0.5 rounded">$${value}M ${coin}</span> inflow into exchange address <span class="text-cyber-accent font-mono">${hex}</span></p>
+                        <div class="mt-6 flex items-center text-xs text-cyber-accent font-bold uppercase tracking-widest group-hover:text-white transition-colors">
+                            Execute Agent Insight <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    `;
+                }, 8000);
+            }
         }
         window.onload = loadDive;
+
+        // Interactive Sandbox Math Engine
+        function runSandboxSim() {
+            playCyberSound('tick');
+            const priceShift = parseFloat(document.getElementById('sandbox-price').value);
+            const volumeMult = parseFloat(document.getElementById('sandbox-volume').value);
+            
+            // Calculate simulated deviation z-score
+            const simulatedZ = Math.abs(priceShift * volumeMult) / 2.5;
+            
+            document.getElementById('sandbox-price-val').innerText = (priceShift >= 0 ? '+' : '') + priceShift.toFixed(1) + '%';
+            document.getElementById('sandbox-volume-val').innerText = volumeMult.toFixed(1) + 'x';
+            document.getElementById('sandbox-score').innerText = simulatedZ.toFixed(2) + ' σ';
+            
+            const scoreEl = document.getElementById('sandbox-score');
+            const statusEl = document.getElementById('sandbox-status');
+            const badgeEl = document.getElementById('sandbox-alert-badge');
+            
+            if (simulatedZ >= 3.5) {
+                playCyberSound('alert');
+                scoreEl.className = "font-bold text-cyber-red animate-pulse";
+                statusEl.className = "font-black text-cyber-red bg-cyber-red/10 border border-cyber-red/20 px-2.5 py-0.5 rounded shadow-[0_0_10px_rgba(255,51,102,0.2)]";
+                statusEl.innerText = "CRITICAL ANOMALY DETECTED";
+                badgeEl.className = "mt-4 px-4 py-2.5 rounded-xl bg-cyber-red/10 border border-cyber-red/30 flex items-center gap-3 text-xs font-black text-cyber-red uppercase tracking-widest shadow-[0_0_15px_rgba(255,51,102,0.2)] animate-pulse";
+                badgeEl.innerHTML = `<i class="fas fa-radiation"></i> WARNING: ${priceShift < 0 ? 'FLASH CRASH' : 'PUMP DEVIATION'} DETECTED!`;
+            } else if (simulatedZ >= 2.0) {
+                scoreEl.className = "font-bold text-cyber-orange";
+                statusEl.className = "font-bold text-cyber-orange bg-cyber-orange/10 border border-cyber-orange/20 px-2.5 py-0.5 rounded";
+                statusEl.innerText = "VOLATILE MARGIN";
+                badgeEl.className = "mt-4 px-4 py-2.5 rounded-xl bg-cyber-orange/10 border border-cyber-orange/30 flex items-center gap-3 text-xs font-bold text-cyber-orange uppercase tracking-widest";
+                badgeEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Caution: Elevated Z-Score deviation`;
+            } else {
+                scoreEl.className = "font-bold text-white";
+                statusEl.className = "font-bold text-cyber-emerald bg-cyber-emerald/10 border border-cyber-emerald/20 px-2.5 py-0.5 rounded";
+                statusEl.innerText = "STABLE";
+                badgeEl.className = "mt-4 px-4 py-2.5 rounded-xl bg-white/5 border border-white/5 flex items-center gap-3 text-xs font-bold text-slate-500 uppercase tracking-widest";
+                badgeEl.innerHTML = `<i class="fas fa-shield-halved"></i> System within normal margins`;
+            }
+        }
     </script>
 </body>
 </html>

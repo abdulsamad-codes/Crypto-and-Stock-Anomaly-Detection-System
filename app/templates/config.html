@@ -115,143 +115,470 @@
     </style>
 </head>
 <body class="min-h-screen relative font-sans antialiased selection:bg-cyber-accent selection:text-black">
+    <!-- Web Audio Cyber Synth Engine (Inherited Client-Side) -->
+    <script>
+        window.audioEnabled = localStorage.getItem('audioEnabled') === 'true';
+        function playCyberSound(type) {
+            if (!window.audioEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                if (type === 'tick') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                } else if (type === 'select') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                } else if (type === 'alert') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.4);
+                }
+            } catch (e) {
+                console.error("Audio error", e);
+            }
+        }
+        
+        function toggleAudio() {
+            window.audioEnabled = !window.audioEnabled;
+            localStorage.setItem('audioEnabled', window.audioEnabled);
+            const btn = document.getElementById('audioBtn');
+            const icon = btn.querySelector('i');
+            const label = btn.querySelector('span');
+            if (window.audioEnabled) {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-cyber-accent/20 border border-cyber-accent/40 text-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.25)] transition-all";
+                icon.className = "fas fa-volume-up animate-pulse";
+                label.innerText = "Audio: Active";
+                playCyberSound('select');
+            } else {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all";
+                icon.className = "fas fa-volume-mute";
+                label.innerText = "Audio: Muted";
+            }
+        }
+        
+        // Initialize navbar audio button state on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('audioBtn');
+            const icon = btn.querySelector('i');
+            const label = btn.querySelector('span');
+            if (window.audioEnabled) {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-cyber-accent/20 border border-cyber-accent/40 text-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.25)] transition-all";
+                icon.className = "fas fa-volume-up animate-pulse";
+                label.innerText = "Audio: Active";
+            }
+        });
+    </script>
+
+    <!-- Dynamic Mouse Glow Overlay -->
+    <div id="mouseGlow" class="fixed pointer-events-none w-[600px] h-[600px] rounded-full bg-cyber-accent/5 blur-[150px] -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-500 z-50"></div>
+
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('mouseGlow');
+            glow.style.opacity = '1';
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mouseleave', () => {
+            document.getElementById('mouseGlow').style.opacity = '0';
+        });
+    </script>
+
     <!-- Ambient Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="glow-blob bg-cyber-emerald w-[500px] h-[500px] top-[10%] right-[10%] animate-blob"></div>
-        <div class="glow-blob bg-cyber-accent w-[400px] h-[400px] bottom-[10%] left-[10%] animate-blob" style="animation-delay: 2s;"></div>
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        <div class="glow-blob bg-cyber-emerald w-[500px] h-[500px] top-[10%] right-[10%] animate-[float-slow_25s_infinite_ease-in-out]"></div>
+        <div class="glow-blob bg-cyber-accent w-[400px] h-[400px] bottom-[10%] left-[10%] animate-[float-medium_20s_infinite_ease-in-out]" style="animation-delay: 2s;"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.015)_1px,transparent_1px)] [background-size:24px_24px] opacity-80"></div>
     </div>
 
-    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/40 px-8 py-5">
+    <!-- Premium Navbar -->
+    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/50 px-8 py-5 border-b border-white/5 shadow-2xl backdrop-blur-xl">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4 group cursor-pointer" onclick="window.location.href='/'">
-                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
-                    <i class="fas fa-brain text-2xl text-cyber-accent"></i>
+            <div class="flex items-center gap-4 group cursor-pointer" onclick="playCyberSound('select'); window.location.href='/'">
+                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 group-hover:border-cyber-accent/60 transition-all duration-500 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <i class="fas fa-brain text-2xl text-cyber-accent group-hover:rotate-12 transition-transform duration-300"></i>
                 </div>
-                <span class="text-2xl font-extrabold tracking-tight text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
+                <span class="text-2xl font-black tracking-wider text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
             </div>
-            <div class="flex gap-10 text-sm font-semibold tracking-wide uppercase text-slate-400">
-                <a href="/" class="transition-colors hover:text-white relative group">
-                    Nerve Center
-                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            
+            <div class="flex gap-10 text-xs font-bold tracking-widest uppercase text-slate-400">
+                <a href="/" onclick="playCyberSound('tick')" class="transition-colors hover:text-white relative group flex items-center gap-1.5 py-1">
+                    <i class="fas fa-network-wired text-slate-500 group-hover:text-white transition-colors"></i> Nerve Center
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyber-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a href="/stream" class="transition-colors hover:text-white relative group">
-                    Live Stream
-                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                <a href="/stream" onclick="playCyberSound('tick')" class="transition-colors hover:text-white relative group flex items-center gap-1.5 py-1">
+                    <i class="fas fa-satellite-dish text-slate-500 group-hover:text-white transition-colors"></i> Live Stream
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyber-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a href="/config" class="nav-link-active transition-colors hover:text-white">Config</a>
+                <a href="/config" onclick="playCyberSound('tick')" class="nav-link-active transition-colors hover:text-white flex items-center gap-1.5 py-1">
+                    <i class="fas fa-sliders-h text-cyber-accent"></i> Config
+                </a>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Audio Feedback Control -->
+                <button id="audioBtn" onclick="toggleAudio()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all shadow-inner">
+                    <i class="fas fa-volume-mute"></i>
+                    <span class="text-xs font-bold tracking-wider uppercase">Audio: Muted</span>
+                </button>
+                
+                <div class="flex items-center gap-3 px-4 py-2 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/20 shadow-[0_0_10px_rgba(0,255,102,0.1)]">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-emerald opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyber-emerald shadow-[0_0_8px_#00FF66]"></span>
+                    </span>
+                    <span class="text-[10px] font-black text-cyber-emerald uppercase tracking-widest">System Online</span>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto p-8 pt-12 pb-24">
+    <main class="max-w-4xl mx-auto p-8 pt-12 pb-24 relative">
         <div class="mb-14">
             <h1 class="text-5xl font-black mb-4 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">System Config</h1>
-            <p class="text-slate-400 text-lg font-light">Fine-tune neural thresholds, adjust detection sensitivity, and manage autonomous deployment targets.</p>
+            <p class="text-slate-400 text-lg font-light leading-relaxed">Fine-tune neural thresholds, adjust detection sensitivity, and manage autonomous deployment targets.</p>
         </div>
 
         <div class="space-y-10">
             <!-- Detection Thresholds -->
-            <div class="glass-card rounded-3xl p-10 shadow-2xl relative overflow-hidden group">
+            <div class="glass-card rounded-3xl p-10 shadow-2xl relative overflow-hidden group border border-white/5">
                 <div class="absolute inset-0 bg-gradient-to-br from-cyber-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                <h2 class="text-2xl font-bold mb-10 flex items-center gap-4 text-white relative z-10">
+                <h2 class="text-2xl font-black mb-10 flex items-center gap-4 text-white relative z-10">
                     <div class="w-10 h-10 rounded-xl bg-cyber-accent/10 border border-cyber-accent/30 flex items-center justify-center text-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.2)]">
                         <i class="fas fa-sliders-h"></i>
                     </div>
                     Neural Model Sensitivity
                 </h2>
+                
                 <div class="space-y-12 relative z-10">
                     <div>
                         <div class="flex justify-between items-end mb-4">
                             <div>
-                                <label class="text-lg font-bold text-white block mb-1">Z-Score Threshold</label>
-                                <span class="text-xs font-bold uppercase tracking-widest text-slate-500">Standard Deviations</span>
+                                <label class="text-lg font-black text-white block mb-1">Z-Score Threshold</label>
+                                <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Standard Deviations</span>
                             </div>
-                            <span class="text-cyber-accent font-mono text-2xl font-bold bg-cyber-accent/10 px-3 py-1 rounded-lg border border-cyber-accent/20">3.5σ</span>
+                            <span id="z-score-val" class="text-cyber-accent font-mono text-2xl font-black bg-cyber-accent/10 px-3 py-1 rounded-lg border border-cyber-accent/20">3.5&sigma;</span>
                         </div>
                         <div class="relative pt-2">
-                            <!-- Track fill glow -->
-                            <div class="absolute top-4 left-0 h-1 bg-cyber-accent rounded-l-full shadow-[0_0_10px_#00F0FF]" style="width: 35%;"></div>
-                            <input type="range" min="1" max="10" step="0.1" value="3.5">
+                            <!-- Glowing range fill overlay -->
+                            <div id="z-score-track" class="absolute top-4 left-0 h-1 bg-cyber-accent rounded-l-full shadow-[0_0_12px_#00F0FF]" style="width: 27.7%;"></div>
+                            <input id="z-score-slider" type="range" min="1" max="10" step="0.1" value="3.5" class="w-full relative" oninput="updateSliders()">
                         </div>
-                        <p class="text-sm text-slate-400 mt-4 flex items-center gap-2"><i class="fas fa-info-circle text-cyber-accent/70"></i> Higher values filter noise but risk missing subtle market manipulation.</p>
+                        <p class="text-xs text-slate-400 mt-4 flex items-center gap-2"><i class="fas fa-info-circle text-cyber-accent/70"></i> Higher values filter noise but risk missing subtle market manipulation.</p>
                     </div>
                     
                     <div class="pt-6 border-t border-white/5">
                         <div class="flex justify-between items-end mb-4">
                             <div>
-                                <label class="text-lg font-bold text-white block mb-1">Flash Crash Sensitivity</label>
-                                <span class="text-xs font-bold uppercase tracking-widest text-slate-500">Reaction Velocity</span>
+                                <label class="text-lg font-black text-white block mb-1">Flash Crash Sensitivity</label>
+                                <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Reaction Velocity</span>
                             </div>
-                            <span class="text-cyber-red font-black text-xl bg-cyber-red/10 px-3 py-1 rounded-lg border border-cyber-red/20 shadow-[0_0_10px_rgba(255,51,102,0.2)]">CRITICAL [9]</span>
+                            <span id="crash-score-val" class="text-cyber-red font-black text-xl bg-cyber-red/10 px-3 py-1 rounded-lg border border-cyber-red/20 shadow-[0_0_10px_rgba(255,51,102,0.2)]">CRITICAL [9]</span>
                         </div>
                         <div class="relative pt-2">
-                            <!-- Custom Red slider thumb for critical via inline style overlay hack -->
                             <style>
                                 #crash-slider::-webkit-slider-thumb {
-                                    background: #FF3366;
-                                    box-shadow: 0 0 15px rgba(255, 51, 102, 0.8), inset 0 0 5px rgba(255, 255, 255, 0.8);
+                                    background: #FF3366 !important;
+                                    box-shadow: 0 0 15px rgba(255, 51, 102, 0.8), inset 0 0 5px rgba(255, 255, 255, 0.8) !important;
                                 }
                             </style>
-                            <div class="absolute top-4 left-0 h-1 bg-cyber-red rounded-l-full shadow-[0_0_10px_#FF3366]" style="width: 90%;"></div>
-                            <input id="crash-slider" type="range" min="1" max="10" step="1" value="9">
+                            <!-- Glowing red range fill overlay -->
+                            <div id="crash-track" class="absolute top-4 left-0 h-1 bg-cyber-red rounded-l-full shadow-[0_0_12px_#FF3366]" style="width: 88.8%;"></div>
+                            <input id="crash-slider" type="range" min="1" max="10" step="1" value="9" class="w-full relative" oninput="updateSliders()">
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Notifications -->
-            <div class="glass-card rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+            <div class="glass-card rounded-3xl p-10 shadow-2xl relative overflow-hidden border border-white/5">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-cyber-emerald/5 blur-3xl rounded-full"></div>
-                <h2 class="text-2xl font-bold mb-8 flex items-center gap-4 text-white relative z-10">
+                <h2 class="text-2xl font-black mb-8 flex items-center gap-4 text-white relative z-10">
                     <div class="w-10 h-10 rounded-xl bg-cyber-emerald/10 border border-cyber-emerald/30 flex items-center justify-center text-cyber-emerald shadow-[0_0_15px_rgba(0,255,102,0.2)]">
                         <i class="fas fa-tower-broadcast"></i>
                     </div>
-                    Notification Routing
+                    Notification Routing Channels
                 </h2>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-                    <!-- Active Toggle -->
-                    <div class="p-6 bg-white/[0.03] rounded-2xl border border-cyber-emerald/30 flex justify-between items-center group cursor-pointer hover:bg-white/[0.05] transition-colors shadow-[0_0_15px_rgba(0,255,102,0.05)]">
-                        <div class="flex items-center gap-5">
-                            <div class="w-12 h-12 rounded-full bg-[#0088cc]/20 flex items-center justify-center">
-                                <i class="fab fa-telegram-plane text-2xl text-[#0088cc]"></i>
+                    <!-- Telegram Toggle Card -->
+                    <div onclick="playCyberSound('select'); toggleChannel('tg')" class="p-6 bg-white/[0.02] hover:bg-white/[0.04] rounded-2xl border border-white/10 flex flex-col gap-4 group cursor-pointer transition-all duration-300 relative overflow-hidden shadow-2xl" id="tg-card">
+                        <div class="flex justify-between items-center w-full">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-[#0088cc]/20 flex items-center justify-center shadow-lg border border-[#0088cc]/30" id="tg-icon-box">
+                                    <i class="fab fa-telegram-plane text-2xl text-[#0088cc]"></i>
+                                </div>
+                                <div>
+                                    <span class="font-black text-white block text-lg">Telegram Bot</span>
+                                    <span class="text-[9px] font-black text-cyber-emerald tracking-widest uppercase" id="tg-status">Connected</span>
+                                </div>
                             </div>
-                            <div>
-                                <span class="font-bold text-white block text-lg">Telegram Bot</span>
-                                <span class="text-xs text-cyber-emerald font-bold tracking-widest uppercase">Connected</span>
+                            <!-- Styled slider switch -->
+                            <div class="w-14 h-7 bg-cyber-emerald rounded-full relative shadow-[0_0_12px_#00FF66] transition-all flex items-center px-1" id="tg-switch">
+                                <div class="w-5 h-5 bg-white rounded-full shadow-sm absolute right-1 transition-all" id="tg-thumb"></div>
                             </div>
                         </div>
-                        <div class="w-14 h-7 bg-cyber-emerald rounded-full relative shadow-[0_0_10px_#00FF66] cursor-pointer">
-                            <div class="w-5 h-5 bg-white rounded-full absolute right-1 top-1 shadow-sm"></div>
+                        
+                        <!-- Test Button -->
+                        <div class="border-t border-white/5 pt-3 flex justify-between items-center text-[10px] font-mono text-slate-500">
+                            <button onclick="event.stopPropagation(); testConnection('tg')" class="px-3 py-1 rounded bg-white/5 border border-white/10 hover:border-cyber-accent hover:text-white transition-colors">TEST ROUTING</button>
+                            <span id="tg-ping" class="text-cyber-emerald">23ms (OK)</span>
                         </div>
                     </div>
                     
-                    <!-- Inactive Toggle -->
-                    <div class="p-6 bg-white/[0.01] rounded-2xl border border-white/5 flex justify-between items-center group cursor-pointer hover:bg-white/[0.03] transition-colors opacity-60">
-                        <div class="flex items-center gap-5">
-                            <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center">
-                                <i class="fas fa-envelope text-xl text-slate-400"></i>
+                    <!-- Email Toggle Card -->
+                    <div onclick="playCyberSound('select'); toggleChannel('email')" class="p-6 bg-white/[0.01] hover:bg-white/[0.03] rounded-2xl border border-white/5 opacity-60 flex flex-col gap-4 group cursor-pointer transition-all duration-300 relative overflow-hidden" id="email-card">
+                        <div class="flex justify-between items-center w-full">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center border border-white/5" id="email-icon-box">
+                                    <i class="fas fa-envelope text-xl text-slate-400"></i>
+                                </div>
+                                <div>
+                                    <span class="font-black text-white block text-lg">Email Alert</span>
+                                    <span class="text-[9px] font-black text-slate-500 tracking-widest uppercase" id="email-status">Disconnected</span>
+                                </div>
                             </div>
-                            <div>
-                                <span class="font-bold text-white block text-lg">Email Alert</span>
-                                <span class="text-xs text-slate-500 font-bold tracking-widest uppercase">Disconnected</span>
+                            <div class="w-14 h-7 bg-slate-800 rounded-full relative border border-white/10 transition-all flex items-center px-1" id="email-switch">
+                                <div class="w-5 h-5 bg-slate-400 rounded-full shadow-sm absolute left-1 transition-all" id="email-thumb"></div>
                             </div>
                         </div>
-                        <div class="w-14 h-7 bg-slate-800 rounded-full relative border border-white/10 cursor-pointer">
-                            <div class="w-5 h-5 bg-slate-400 rounded-full absolute left-1 top-1 shadow-sm"></div>
+                        
+                        <!-- Test Button -->
+                        <div class="border-t border-white/5 pt-3 flex justify-between items-center text-[10px] font-mono text-slate-500">
+                            <button onclick="event.stopPropagation(); testConnection('email')" class="px-3 py-1 rounded bg-white/5 border border-white/10 hover:border-cyber-accent hover:text-white transition-colors cursor-not-allowed opacity-50" disabled>TEST ROUTING</button>
+                            <span id="email-ping" class="text-slate-500">OFFLINE</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Deploy Button -->
-            <button class="w-full py-6 bg-cyber-emerald/10 hover:bg-cyber-emerald/20 border border-cyber-emerald/30 hover:border-cyber-emerald/60 rounded-2xl text-xl font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(0,255,102,0.1)] text-cyber-emerald hover:text-white transition-all duration-300 relative overflow-hidden group">
-                <span class="relative z-10 flex items-center justify-center gap-4">
-                    Deploy Global Config <i class="fas fa-rocket group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"></i>
-                </span>
-                <div class="absolute inset-0 w-0 bg-cyber-emerald group-hover:w-full transition-all duration-500 ease-out z-0 opacity-20"></div>
-            </button>
+            <!-- Deploy Panel & Circular Trigger -->
+            <div class="relative w-full">
+                <!-- Circular Loading Sequence Area (hidden by default) -->
+                <div id="deployingSequence" class="hidden glass-card rounded-3xl p-10 mb-6 border border-cyber-accent/30 text-center flex flex-col items-center justify-center shadow-[0_0_30px_rgba(0,240,255,0.15)] relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0),rgba(0,240,255,0.015)_50%,rgba(255,255,255,0)_50%)] bg-[size:100%_4px] pointer-events-none"></div>
+                    
+                    <!-- Pulsing Circular Spinner -->
+                    <div class="relative flex items-center justify-center w-24 h-24 mb-6">
+                        <div class="absolute inset-0 rounded-full border-4 border-white/5"></div>
+                        <div class="absolute inset-0 rounded-full border-4 border-t-cyber-accent border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+                        <div id="deploy-percentage" class="font-mono text-xl font-black text-white">0%</div>
+                    </div>
+                    
+                    <h3 id="deploy-label" class="text-sm font-black uppercase tracking-[0.22em] text-cyber-accent animate-pulse mb-2">Pinging Model Nodes</h3>
+                    <p id="deploy-sub" class="text-xs font-mono text-slate-500 max-w-sm">Authenticating configuration weights on 16 global edge gateways...</p>
+                </div>
+
+                <!-- Deploy Button -->
+                <button id="deployBtn" onclick="triggerDeployment()" class="w-full py-6 bg-cyber-emerald/10 hover:bg-cyber-emerald/20 border border-cyber-emerald/30 hover:border-cyber-emerald/60 rounded-2xl text-lg font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(0,255,102,0.1)] text-cyber-emerald hover:text-white transition-all duration-300 relative overflow-hidden group">
+                    <span class="relative z-10 flex items-center justify-center gap-4">
+                        Deploy Global Config <i class="fas fa-rocket group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"></i>
+                    </span>
+                    <div class="absolute inset-0 w-0 bg-cyber-emerald group-hover:w-full transition-all duration-500 ease-out z-0 opacity-20"></div>
+                </button>
+            </div>
         </div>
     </main>
+
+    <style>
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+            50% { transform: translateY(-30px) translateX(20px) scale(1.05); }
+        }
+        @keyframes float-medium {
+            0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+            50% { transform: translateY(40px) translateX(-30px) scale(0.95); }
+        }
+    </style>
+
+    <script>
+        function updateSliders() {
+            playCyberSound('tick');
+            const zSlider = document.getElementById('z-score-slider');
+            const zVal = parseFloat(zSlider.value);
+            document.getElementById('z-score-val').innerText = zVal.toFixed(1) + 'σ';
+            
+            // Calculate percentage width of the slider fill
+            const zPct = ((zVal - 1) / 9) * 100;
+            document.getElementById('z-score-track').style.width = zPct + '%';
+
+            const cSlider = document.getElementById('crash-slider');
+            const cVal = parseInt(cSlider.value);
+            const cPct = ((cVal - 1) / 9) * 100;
+            document.getElementById('crash-track').style.width = cPct + '%';
+
+            const cValEl = document.getElementById('crash-score-val');
+            if (cVal >= 8) {
+                cValEl.className = "text-cyber-red font-black text-xl bg-cyber-red/10 border border-cyber-red/20 px-3 py-1 rounded-lg shadow-[0_0_10px_rgba(255,51,102,0.2)]";
+                cValEl.innerText = `CRITICAL [${cVal}]`;
+            } else if (cVal >= 5) {
+                cValEl.className = "text-cyber-orange font-bold text-xl bg-cyber-orange/10 border border-cyber-orange/20 px-3 py-1 rounded-lg";
+                cValEl.innerText = `ELEVATED [${cVal}]`;
+            } else {
+                cValEl.className = "text-cyber-emerald font-bold text-xl bg-cyber-emerald/10 border border-cyber-emerald/20 px-3 py-1 rounded-lg";
+                cValEl.innerText = `STABLE [${cVal}]`;
+            }
+        }
+
+        // Routing channels wiggles
+        function toggleChannel(chan) {
+            playCyberSound('select');
+            const card = document.getElementById(chan + '-card');
+            const switchEl = document.getElementById(chan + '-switch');
+            const thumb = document.getElementById(chan + '-thumb');
+            const status = document.getElementById(chan + '-status');
+            const iconBox = document.getElementById(chan + '-icon-box');
+            const ping = document.getElementById(chan + '-ping');
+
+            if (chan === 'tg') {
+                const isActive = switchEl.classList.contains('bg-cyber-emerald');
+                if (isActive) {
+                    // Turn OFF
+                    switchEl.className = "w-14 h-7 bg-slate-800 rounded-full relative border border-white/10 transition-all flex items-center px-1";
+                    thumb.style.left = '4px';
+                    thumb.style.right = 'auto';
+                    thumb.className = "w-5 h-5 bg-slate-400 rounded-full shadow-sm absolute transition-all";
+                    status.className = "text-[9px] font-black text-slate-500 tracking-widest uppercase";
+                    status.innerText = "Disconnected";
+                    card.style.borderColor = 'rgba(255,255,255,0.05)';
+                    iconBox.className = "w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center border border-white/5";
+                    ping.innerText = "OFFLINE";
+                    ping.className = "text-slate-500";
+                } else {
+                    // Turn ON
+                    switchEl.className = "w-14 h-7 bg-cyber-emerald rounded-full relative shadow-[0_0_12px_#00FF66] transition-all flex items-center px-1";
+                    thumb.style.right = '4px';
+                    thumb.style.left = 'auto';
+                    thumb.className = "w-5 h-5 bg-white rounded-full shadow-sm absolute transition-all";
+                    status.className = "text-[9px] font-black text-cyber-emerald tracking-widest uppercase";
+                    status.innerText = "Connected";
+                    card.style.borderColor = 'rgba(0, 255, 102, 0.3)';
+                    iconBox.className = "w-12 h-12 rounded-full bg-[#0088cc]/20 flex items-center justify-center shadow-lg border border-[#0088cc]/30";
+                    ping.innerText = "23ms (OK)";
+                    ping.className = "text-cyber-emerald";
+                }
+            } else if (chan === 'email') {
+                const isActive = switchEl.classList.contains('bg-cyber-emerald');
+                if (isActive) {
+                    // Turn OFF
+                    switchEl.className = "w-14 h-7 bg-slate-800 rounded-full relative border border-white/10 transition-all flex items-center px-1";
+                    thumb.style.left = '4px';
+                    thumb.style.right = 'auto';
+                    thumb.className = "w-5 h-5 bg-slate-400 rounded-full shadow-sm absolute transition-all";
+                    status.className = "text-[9px] font-black text-slate-500 tracking-widest uppercase";
+                    status.innerText = "Disconnected";
+                    card.classList.add('opacity-60');
+                    card.style.borderColor = 'rgba(255,255,255,0.05)';
+                    iconBox.className = "w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center border border-white/5";
+                    ping.innerText = "OFFLINE";
+                    ping.className = "text-slate-500";
+                    card.querySelector('button').disabled = true;
+                    card.querySelector('button').className = "px-3 py-1 rounded bg-white/5 border border-white/10 hover:border-cyber-accent hover:text-white transition-colors cursor-not-allowed opacity-50";
+                } else {
+                    // Turn ON
+                    switchEl.className = "w-14 h-7 bg-cyber-emerald rounded-full relative shadow-[0_0_12px_#00FF66] transition-all flex items-center px-1";
+                    thumb.style.right = '4px';
+                    thumb.style.left = 'auto';
+                    thumb.className = "w-5 h-5 bg-white rounded-full shadow-sm absolute transition-all";
+                    status.className = "text-[9px] font-black text-cyber-emerald tracking-widest uppercase";
+                    status.innerText = "Connected";
+                    card.classList.remove('opacity-60');
+                    card.style.borderColor = 'rgba(0, 255, 102, 0.3)';
+                    iconBox.className = "w-12 h-12 rounded-full bg-cyber-purple/20 flex items-center justify-center shadow-lg border border-cyber-purple/30";
+                    ping.innerText = "45ms (OK)";
+                    ping.className = "text-cyber-emerald";
+                    card.querySelector('button').disabled = false;
+                    card.querySelector('button').className = "px-3 py-1 rounded bg-white/5 border border-white/10 hover:border-cyber-accent hover:text-white transition-colors";
+                }
+            }
+        }
+
+        // Connection test logic
+        function testConnection(chan) {
+            playCyberSound('select');
+            const pingEl = document.getElementById(chan + '-ping');
+            pingEl.innerText = "PINGING GATEWAY...";
+            pingEl.className = "text-cyber-accent animate-pulse font-bold";
+            
+            setTimeout(() => {
+                playCyberSound('tick');
+                const latency = Math.floor(18 + Math.random() * 30);
+                pingEl.innerText = `${latency}ms (GATEWAY OK)`;
+                pingEl.className = "text-cyber-emerald font-bold";
+            }, 1200);
+        }
+
+        // Cinematic Deploy Progress Seq
+        function triggerDeployment() {
+            playCyberSound('alert');
+            const btn = document.getElementById('deployBtn');
+            const seq = document.getElementById('deployingSequence');
+            
+            btn.disabled = true;
+            btn.className = "w-full py-6 bg-slate-900 border border-white/5 rounded-2xl text-lg font-black uppercase tracking-[0.2em] text-slate-600 transition-all cursor-not-allowed opacity-50";
+            
+            seq.classList.remove('hidden');
+            
+            const pct = document.getElementById('deploy-percentage');
+            const label = document.getElementById('deploy-label');
+            const sub = document.getElementById('deploy-sub');
+            
+            let count = 0;
+            const progress = setInterval(() => {
+                count += Math.floor(Math.random() * 8) + 2;
+                if (count >= 100) {
+                    count = 100;
+                    clearInterval(progress);
+                    
+                    playCyberSound('select');
+                    pct.innerText = "100%";
+                    pct.className = "font-mono text-xl font-black text-cyber-emerald drop-shadow-[0_0_10px_#00FF66]";
+                    label.innerText = "DEPLOYED SUCCESSFULLY";
+                    label.className = "text-sm font-black uppercase tracking-[0.22em] text-cyber-emerald animate-none";
+                    sub.innerText = "Global model weight matrices successfully synchronized with all 16 node gateways.";
+                    
+                    setTimeout(() => {
+                        seq.classList.add('hidden');
+                        btn.disabled = false;
+                        btn.className = "w-full py-6 bg-cyber-emerald/10 hover:bg-cyber-emerald/20 border border-cyber-emerald/30 hover:border-cyber-emerald/60 rounded-2xl text-lg font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(0,255,102,0.1)] text-cyber-emerald hover:text-white transition-all duration-300 relative overflow-hidden group";
+                        pct.className = "font-mono text-xl font-black text-white";
+                    }, 4000);
+                } else {
+                    pct.innerText = count + '%';
+                    playCyberSound('tick');
+                    
+                    if (count >= 75) {
+                        label.innerText = "Writing Weight Matrices";
+                        sub.innerText = "Propagating sensitivity coefficients to satellite relays...";
+                    } else if (count >= 40) {
+                        label.innerText = "Verifying Consensus Nodes";
+                        sub.innerText = "Synchronizing Standard Deviation Z-Scores across edges...";
+                    } else {
+                        label.innerText = "Pinging Model Nodes";
+                        sub.innerText = "Authenticating secure websocket gateways on 16 global proxies...";
+                    }
+                }
+            }, 150);
+        }
+    </script>
 </body>
 </html>
