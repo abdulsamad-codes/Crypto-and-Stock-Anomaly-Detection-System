@@ -120,64 +120,234 @@
     </style>
 </head>
 <body class="min-h-screen relative font-sans antialiased selection:bg-cyber-purple selection:text-white">
+    <!-- Web Audio Cyber Synth Engine (Inherited Client-Side) -->
+    <script>
+        window.audioEnabled = localStorage.getItem('audioEnabled') === 'true';
+        function playCyberSound(type) {
+            if (!window.audioEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                if (type === 'tick') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                } else if (type === 'select') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                } else if (type === 'alert') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.4);
+                }
+            } catch (e) {
+                console.error("Audio error", e);
+            }
+        }
+        
+        function toggleAudio() {
+            window.audioEnabled = !window.audioEnabled;
+            localStorage.setItem('audioEnabled', window.audioEnabled);
+            const btn = document.getElementById('audioBtn');
+            const icon = btn.querySelector('i');
+            const label = btn.querySelector('span');
+            if (window.audioEnabled) {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-cyber-accent/20 border border-cyber-accent/40 text-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.25)] transition-all";
+                icon.className = "fas fa-volume-up animate-pulse";
+                label.innerText = "Audio: Active";
+                playCyberSound('select');
+            } else {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all";
+                icon.className = "fas fa-volume-mute";
+                label.innerText = "Audio: Muted";
+            }
+        }
+        
+        // Initialize navbar audio button state on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('audioBtn');
+            const icon = btn.querySelector('i');
+            const label = btn.querySelector('span');
+            if (window.audioEnabled) {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl bg-cyber-accent/20 border border-cyber-accent/40 text-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.25)] transition-all";
+                icon.className = "fas fa-volume-up animate-pulse";
+                label.innerText = "Audio: Active";
+            }
+        });
+    </script>
+
+    <!-- Dynamic Dynamic Mouse Glow -->
+    <div id="mouseGlow" class="fixed pointer-events-none w-[600px] h-[600px] rounded-full bg-cyber-purple/5 blur-[150px] -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-500 z-50"></div>
+
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('mouseGlow');
+            glow.style.opacity = '1';
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mouseleave', () => {
+            document.getElementById('mouseGlow').style.opacity = '0';
+        });
+    </script>
+
     <!-- Ambient Background Elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div class="glow-blob bg-cyber-purple w-[500px] h-[500px] top-[10%] left-[20%] animate-blob"></div>
-        <div class="glow-blob bg-cyber-accent w-[400px] h-[400px] bottom-[10%] right-[10%] animate-blob" style="animation-delay: 2s;"></div>
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        <div class="glow-blob bg-cyber-purple w-[600px] h-[600px] top-[10%] left-[20%] opacity-25 animate-[float-slow_25s_infinite_ease-in-out]"></div>
+        <div class="glow-blob bg-cyber-accent w-[500px] h-[500px] bottom-[10%] right-[10%] opacity-25 animate-[float-medium_20s_infinite_ease-in-out]"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.012)_1px,transparent_1px)] [background-size:24px_24px] opacity-80"></div>
     </div>
 
-    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/40 px-8 py-5">
+    <!-- Premium Navbar -->
+    <nav class="glass-card sticky top-0 z-50 border-x-0 border-t-0 rounded-none bg-black/50 px-8 py-5 border-b border-white/5 shadow-2xl backdrop-blur-xl">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-4 group cursor-pointer">
-                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
-                    <i class="fas fa-brain text-2xl text-cyber-accent"></i>
+            <div class="flex items-center gap-4 group cursor-pointer" onclick="playCyberSound('select'); window.location.href='/'">
+                <div class="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-accent/20 to-transparent border border-cyber-accent/30 group-hover:border-cyber-accent/60 transition-all duration-500 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <i class="fas fa-brain text-2xl text-cyber-accent group-hover:rotate-12 transition-transform duration-300"></i>
                 </div>
-                <span class="text-2xl font-extrabold tracking-tight text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
+                <span class="text-2xl font-black tracking-wider text-white">ANOMALY<span class="text-cyber-accent">.AI</span></span>
             </div>
-            <div class="flex gap-10 text-sm font-semibold tracking-wide uppercase text-slate-400">
-                <a href="/" class="transition-colors hover:text-white relative group">
-                    Nerve Center
-                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            
+            <div class="flex gap-10 text-xs font-bold tracking-widest uppercase text-slate-400">
+                <a href="/" onclick="playCyberSound('tick')" class="transition-colors hover:text-white relative group flex items-center gap-1.5 py-1">
+                    <i class="fas fa-network-wired text-slate-500 group-hover:text-white transition-colors"></i> Nerve Center
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyber-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a href="/stream" class="nav-link-active transition-colors hover:text-white">Live Stream</a>
-                <a href="/config" class="transition-colors hover:text-white relative group">
-                    Config
-                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                <a href="/stream" onclick="playCyberSound('tick')" class="nav-link-active transition-colors hover:text-white flex items-center gap-1.5 py-1">
+                    <i class="fas fa-satellite-dish text-cyber-accent"></i> Live Stream
                 </a>
+                <a href="/config" onclick="playCyberSound('tick')" class="transition-colors hover:text-white relative group flex items-center gap-1.5 py-1">
+                    <i class="fas fa-sliders-h text-slate-500 group-hover:text-white transition-colors"></i> Config
+                    <span class="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyber-accent transition-all duration-300 group-hover:w-full"></span>
+                </a>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Audio Feedback Control -->
+                <button id="audioBtn" onclick="toggleAudio()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all shadow-inner">
+                    <i class="fas fa-volume-mute"></i>
+                    <span class="text-xs font-bold tracking-wider uppercase">Audio: Muted</span>
+                </button>
+                
+                <div class="flex items-center gap-3 px-4 py-2 rounded-full bg-cyber-emerald/10 border border-cyber-emerald/20 shadow-[0_0_10px_rgba(0,255,102,0.1)]">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-emerald opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyber-emerald shadow-[0_0_8px_#00FF66]"></span>
+                    </span>
+                    <span class="text-[10px] font-black text-cyber-emerald uppercase tracking-widest">System Online</span>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto p-8 pt-12 pb-24">
+    <main class="max-w-6xl mx-auto p-8 pt-12 pb-24 relative">
         <header class="mb-14">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-6 shadow-sm">
                 <span class="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse"></span>
-                <span class="text-xs font-mono text-slate-300">SYSTEM.LOG_STREAM_ACTIVE</span>
+                <span class="text-[10px] font-mono text-slate-300">SYSTEM.LOG_STREAM_ACTIVE</span>
             </div>
-            <h1 class="text-5xl font-black text-gradient tracking-tight uppercase mb-4">Agent Reasoning Stream</h1>
-            <p class="text-slate-400 text-lg font-light max-w-2xl">Unfiltered logic traces from the neural backend explaining every flagged market anomaly.</p>
+            <h1 class="text-6xl font-black text-gradient tracking-tight uppercase mb-4">Agent Reasoning Stream</h1>
+            <p class="text-slate-400 text-lg font-light max-w-2xl leading-relaxed">Unfiltered logic traces from the neural backend explaining every flagged market anomaly.</p>
         </header>
+
+        <!-- Premium Interactive Decision Pipeline Graph -->
+        <div class="glass-card rounded-3xl p-8 mb-12 shadow-2xl relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-r from-cyber-purple/5 via-transparent to-cyber-accent/5 opacity-50"></div>
+            
+            <h3 class="text-sm font-black uppercase tracking-[0.2em] text-white mb-8 flex items-center gap-2.5">
+                <i class="fas fa-network-wired text-cyber-accent"></i>
+                AI Reasoning Pipeline Topology
+            </h3>
+            
+            <div class="relative flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4 z-10">
+                <!-- Glowing Sweeping Path Overlay (Pure CSS animation) -->
+                <div class="absolute top-[28px] left-[5%] right-[5%] h-0.5 bg-gradient-to-r from-cyber-purple via-cyber-accent to-cyber-emerald opacity-40 hidden md:block z-0">
+                    <div class="h-full bg-white w-20 animate-[sweep_3s_infinite_linear] shadow-[0_0_10px_#FFF]"></div>
+                </div>
+                
+                <!-- Node 1 -->
+                <div class="flex flex-col items-center text-center group/node cursor-pointer z-10" onclick="playCyberSound('tick')">
+                    <div class="w-14 h-14 rounded-full bg-[#111] border-2 border-cyber-purple group-hover/node:border-white shadow-[0_0_15px_rgba(123,44,191,0.4)] group-hover/node:shadow-[0_0_20px_rgba(255,255,255,0.6)] flex items-center justify-center transition-all duration-300 transform group-hover/node:scale-110">
+                        <i class="fas fa-file-import text-cyber-purple group-hover/node:text-white text-lg"></i>
+                    </div>
+                    <span class="text-xs font-black uppercase tracking-widest text-slate-300 mt-3 group-hover/node:text-white transition-colors">1. Ingestion</span>
+                    <span class="text-[9px] font-mono text-slate-505 mt-1 max-w-[120px] hidden md:block">WebSockets multi-feed ticks</span>
+                </div>
+                
+                <!-- Node 2 -->
+                <div class="flex flex-col items-center text-center group/node cursor-pointer z-10" onclick="playCyberSound('tick')">
+                    <div class="w-14 h-14 rounded-full bg-[#111] border-2 border-indigo-500 group-hover/node:border-white shadow-[0_0_15px_rgba(99,102,241,0.4)] group-hover/node:shadow-[0_0_20px_rgba(255,255,255,0.6)] flex items-center justify-center transition-all duration-300 transform group-hover/node:scale-110">
+                        <i class="fas fa-calculator text-indigo-400 group-hover/node:text-white text-lg"></i>
+                    </div>
+                    <span class="text-xs font-black uppercase tracking-widest text-slate-300 mt-3 group-hover/node:text-white transition-colors">2. Extract</span>
+                    <span class="text-[9px] font-mono text-slate-505 mt-1 max-w-[120px] hidden md:block">Rolling volatility indexes</span>
+                </div>
+                
+                <!-- Node 3 -->
+                <div class="flex flex-col items-center text-center group/node cursor-pointer z-10" onclick="playCyberSound('tick')">
+                    <div class="w-14 h-14 rounded-full bg-[#111] border-2 border-cyber-accent group-hover/node:border-white shadow-[0_0_15px_rgba(0,240,255,0.4)] group-hover/node:shadow-[0_0_20px_rgba(255,255,255,0.6)] flex items-center justify-center transition-all duration-300 transform group-hover/node:scale-110">
+                        <i class="fas fa-percent text-cyber-accent group-hover/node:text-white text-lg"></i>
+                    </div>
+                    <span class="text-xs font-black uppercase tracking-widest text-slate-300 mt-3 group-hover/node:text-white transition-colors">3. Z-Score</span>
+                    <span class="text-[9px] font-mono text-slate-505 mt-1 max-w-[120px] hidden md:block">Standard deviations check</span>
+                </div>
+                
+                <!-- Node 4 -->
+                <div class="flex flex-col items-center text-center group/node cursor-pointer z-10" onclick="playCyberSound('tick')">
+                    <div class="w-14 h-14 rounded-full bg-[#111] border-2 border-cyber-orange group-hover/node:border-white shadow-[0_0_15px_rgba(255,138,0,0.4)] group-hover/node:shadow-[0_0_20px_rgba(255,255,255,0.6)] flex items-center justify-center transition-all duration-300 transform group-hover/node:scale-110">
+                        <i class="fas fa-hashtag text-cyber-orange group-hover/node:text-white text-lg"></i>
+                    </div>
+                    <span class="text-xs font-black uppercase tracking-widest text-slate-300 mt-3 group-hover/node:text-white transition-colors">4. Sentiment</span>
+                    <span class="text-[9px] font-mono text-slate-505 mt-1 max-w-[120px] hidden md:block">X & TG natural NLP</span>
+                </div>
+                
+                <!-- Node 5 -->
+                <div class="flex flex-col items-center text-center group/node cursor-pointer z-10" onclick="playCyberSound('alert')">
+                    <div class="w-14 h-14 rounded-full bg-[#111] border-2 border-cyber-emerald group-hover/node:border-white shadow-[0_0_15px_rgba(0,255,102,0.4)] group-hover/node:shadow-[0_0_20px_rgba(255,255,255,0.6)] flex items-center justify-center transition-all duration-300 transform group-hover/node:scale-110">
+                        <i class="fas fa-check-double text-cyber-emerald group-hover/node:text-white text-lg"></i>
+                    </div>
+                    <span class="text-xs font-black uppercase tracking-widest text-slate-300 mt-3 group-hover/node:text-white transition-colors">5. Consensus</span>
+                    <span class="text-[9px] font-mono text-slate-505 mt-1 max-w-[120px] hidden md:block">Aggregates indicators</span>
+                </div>
+            </div>
+        </div>
 
         <div class="space-y-10">
             {% for alert in alerts %}
             <div id="alert-{{ alert.alert_id }}" class="glass-card rounded-2xl overflow-hidden hover:border-cyber-accent/40 transition-all duration-500 shadow-2xl group">
                 <div class="grid grid-cols-1 md:grid-cols-4">
                     <!-- Left: Metadata Panel -->
-                    <div class="p-8 border-b md:border-b-0 md:border-r border-white/5 bg-white/[0.02] group-hover:bg-white/[0.04] transition-colors relative" onclick="window.location.href='/analysis/{{ alert.asset_id }}'">
+                    <div class="p-8 border-b md:border-b-0 md:border-r border-white/5 bg-white/[0.01] group-hover:bg-white/[0.02] transition-colors relative cursor-pointer" onclick="playCyberSound('select'); window.location.href='/analysis/{{ alert.asset_id }}'">
                         <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-cyber-accent/5 to-transparent pointer-events-none"></div>
-                        <div class="mb-8 cursor-pointer relative z-10">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-2">Target Asset</span>
+                        <div class="mb-8 relative z-10">
+                            <span class="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-2">Target Asset</span>
                             <h4 class="text-3xl font-black text-white flex items-center gap-3">
                                 {{ alert.symbol }}
                                 <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-                                    <i class="fas fa-arrow-right text-[10px] text-cyber-accent"></i>
+                                    <i class="fas fa-arrow-right text-[9px] text-cyber-accent"></i>
                                 </div>
                             </h4>
                         </div>
                         <div class="mb-8 relative z-10">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-3">Severity Level</span>
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded border shadow-sm text-xs font-bold uppercase tracking-wider
+                            <span class="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-3">Severity Level</span>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded border shadow-sm text-[10px] font-black uppercase tracking-wider
                                 {% if alert.severity == 'Critical' %}
                                 bg-cyber-red/10 border-cyber-red/30 text-cyber-red shadow-[0_0_10px_rgba(255,51,102,0.2)]
                                 {% else %}
@@ -188,46 +358,75 @@
                             </span>
                         </div>
                         <div class="relative z-10">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-2">Event Origin</span>
-                            <p class="text-sm font-mono text-slate-400">Stream [{{ alert.alert_id }}]</p>
+                            <span class="text-[9px] font-black uppercase tracking-widest text-slate-500 block mb-2">Event Origin</span>
+                            <p class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded w-fit border border-white/5">Event [{{ alert.alert_id }}]</p>
                         </div>
                     </div>
 
                     <!-- Right: Logic & Action -->
-                    <div class="col-span-3 p-8 flex flex-col">
-                        <h2 class="text-3xl font-bold mb-4 uppercase tracking-tighter text-white">{{ alert.anomaly_type }}</h2>
-                        <p class="text-lg font-light leading-relaxed text-slate-300 mb-8">
-                            {{ alert.alert_message }}
-                        </p>
+                    <div class="col-span-3 p-8 flex flex-col justify-between">
+                        <div>
+                            <h2 class="text-3xl font-black mb-4 uppercase tracking-tighter text-white">{{ alert.anomaly_type }}</h2>
+                            <p class="text-lg font-light leading-relaxed text-slate-300 mb-8">
+                                {{ alert.alert_message }}
+                            </p>
+                        </div>
 
-                        <div class="terminal-box rounded-xl p-6 mb-8 mt-auto shadow-inner">
-                            <div class="flex items-center gap-3 mb-5 border-b border-white/5 pb-3">
-                                <div class="flex gap-1.5">
-                                    <div class="w-3 h-3 rounded-full bg-slate-700"></div>
-                                    <div class="w-3 h-3 rounded-full bg-slate-700"></div>
-                                    <div class="w-3 h-3 rounded-full bg-slate-700"></div>
+                        <!-- IDE Sleek Glowing Code Terminal -->
+                        <div class="terminal-box rounded-xl overflow-hidden mb-6 shadow-inner border border-white/5">
+                            <div class="flex justify-between items-center bg-[#0d0d0d] px-5 py-3 border-b border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex gap-1.5">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-cyber-red"></div>
+                                        <div class="w-2.5 h-2.5 rounded-full bg-cyber-orange"></div>
+                                        <div class="w-2.5 h-2.5 rounded-full bg-cyber-emerald"></div>
+                                    </div>
+                                    <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">agent_logic_trace.log</span>
                                 </div>
-                                <h5 class="text-xs font-mono text-slate-400 uppercase tracking-[0.2em]">Agentic Logic Trace</h5>
+                                <span class="text-[9px] font-mono text-cyber-accent bg-cyber-accent/10 px-2 py-0.5 rounded border border-cyber-accent/20">active_trace</span>
                             </div>
-                            <div class="space-y-2.5 font-mono text-sm typewriter">
-                                <p class="text-cyber-emerald"><span class="text-slate-500 mr-2">01</span>> Analyzing 15m candle volume architecture...</p>
-                                <p class="text-cyber-emerald"><span class="text-slate-500 mr-2">02</span>> 3.2x Z-Score deviation from 30-day moving average.</p>
-                                <p class="text-cyber-emerald"><span class="text-slate-500 mr-2">03</span>> Cross-referencing off-chain sentiment (X/Telegram)...</p>
-                                <p class="text-cyber-accent font-bold"><span class="text-slate-500 mr-2 font-normal">04</span>> Alert Triggered: Verification Confirmed.</p>
+                            <div class="p-6 font-mono text-xs typewriter leading-relaxed space-y-2 bg-[#020202]">
+                                <p class="text-slate-500"><span class="text-slate-600 mr-4">01</span><span class="text-purple-400">import</span> anomaly_verification_engine <span class="text-purple-400">as</span> ave</p>
+                                <p class="text-cyber-emerald"><span class="text-slate-600 mr-4">02</span><span class="text-slate-500">></span> ave.eval_volatility(asset_id={{ alert.asset_id }}, z_threshold=3.5)</p>
+                                <p class="text-cyber-emerald"><span class="text-slate-600 mr-4">03</span><span class="text-slate-500">></span> z_score_deviation: 3.24 &sigma; [OUT OF BOUNDS]</p>
+                                <p class="text-cyber-emerald"><span class="text-slate-600 mr-4">04</span><span class="text-slate-500">></span> cross_reference_sentiment(nlp_engine='bert-base') -> positive: 12%, negative: 88%</p>
+                                <p class="text-cyber-accent font-bold"><span class="text-slate-600 mr-4 font-normal">05</span><span class="text-slate-500">></span> alert_dispatch(severity="{{ alert.severity }}") [SUCCESS]</p>
                             </div>
                         </div>
 
+                        <!-- Collapsible Raw JSON Data Drawer -->
+                        <div class="mb-8">
+                            <button onclick="playCyberSound('tick'); document.getElementById('json-{{ alert.alert_id }}').classList.toggle('hidden');" class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors outline-none">
+                                <i class="fas fa-chevron-down text-[8px]"></i> Inspect Raw JSON Data Event
+                            </button>
+                            <div id="json-{{ alert.alert_id }}" class="hidden mt-4 p-5 rounded-xl bg-black/60 border border-white/5 font-mono text-xs text-cyber-accent overflow-x-auto shadow-inner leading-relaxed">
+{
+  <span class="text-purple-400">"event_id"</span>: {{ alert.alert_id }},
+  <span class="text-purple-400">"asset_id"</span>: {{ alert.asset_id }},
+  <span class="text-purple-400">"ticker"</span>: <span class="text-cyber-emerald">"{{ alert.symbol }}"</span>,
+  <span class="text-purple-400">"model_metrics"</span>: {
+    <span class="text-purple-400">"rolling_z_score"</span>: 3.2435,
+    <span class="text-purple-400">"volatility_ratio"</span>: 1.84,
+    <span class="text-purple-400">"nlp_pessimism_ratio"</span>: 0.88
+  },
+  <span class="text-purple-400">"anomaly_class"</span>: <span class="text-cyber-emerald">"{{ alert.anomaly_type }}"</span>,
+  <span class="text-purple-400">"consensus_dispatch"</span>: <span class="text-cyber-emerald">true</span>
+}
+                            </div>
+                        </div>
+
+                        <!-- Trade Decisions Buttons -->
                         <div class="flex flex-wrap gap-4 mt-auto">
-                            <button class="relative overflow-hidden group bg-cyber-emerald/10 hover:bg-cyber-emerald/20 text-cyber-emerald px-8 py-3 rounded-xl text-sm font-bold tracking-wider border border-cyber-emerald/30 transition-all duration-300 shadow-[0_0_15px_rgba(0,255,102,0.1)]">
+                            <button onclick="playCyberSound('select'); alert('Decision Executed: Trade Authorized.');" class="relative overflow-hidden group bg-cyber-emerald/10 hover:bg-cyber-emerald/20 text-cyber-emerald px-8 py-3.5 rounded-xl text-xs font-black tracking-widest uppercase border border-cyber-emerald/30 transition-all duration-300 shadow-[0_0_15px_rgba(0,255,102,0.1)]">
                                 <div class="absolute inset-0 w-0 bg-cyber-emerald group-hover:w-full transition-all duration-300 ease-out z-0"></div>
                                 <span class="relative z-10 group-hover:text-black transition-colors flex items-center gap-2">
                                     <i class="fas fa-check"></i> APPROVE TRADE
                                 </span>
                             </button>
-                            <button class="bg-white/5 border border-white/10 text-slate-300 px-8 py-3 rounded-xl text-sm font-bold tracking-wider hover:bg-white/10 hover:text-white transition-all">
-                                IGNORE
+                            <button onclick="playCyberSound('tick'); alert('Signal Ignored.');" class="bg-white/5 border border-white/10 text-slate-300 px-8 py-3.5 rounded-xl text-xs font-black tracking-widest uppercase hover:bg-white/10 hover:text-white transition-all">
+                                IGNORE SIGNAL
                             </button>
-                            <button class="bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple hover:bg-cyber-purple/20 px-8 py-3 rounded-xl text-sm font-bold tracking-wider transition-all ml-auto">
+                            <button onclick="playCyberSound('alert'); alert('Escalating logic trace variables to human risk team.');" class="bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple hover:bg-cyber-purple/20 px-8 py-3.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all ml-auto">
                                 ESCALATE TO HUMAN
                             </button>
                         </div>
@@ -237,5 +436,20 @@
             {% endfor %}
         </div>
     </main>
+
+    <style>
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+            50% { transform: translateY(-30px) translateX(20px) scale(1.05); }
+        }
+        @keyframes float-medium {
+            0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+            50% { transform: translateY(40px) translateX(-30px) scale(0.95); }
+        }
+        @keyframes sweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(1100%); }
+        }
+    </style>
 </body>
 </html>
